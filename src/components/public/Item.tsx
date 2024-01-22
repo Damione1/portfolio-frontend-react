@@ -1,26 +1,6 @@
 import React from 'react';
-
-export interface Post {
-  id: string;
-  title: string;
-  subTitle: string;
-  startDate: Date;
-  endDate: Date;
-  current: boolean;
-  description: string;
-
-  /** @deprecated */
-  company: string;
-
-  /** @deprecated */
-  position: string;
-
-  /** @deprecated */
-  school: string;
-
-  /** @deprecated */
-  grade: string;
-}
+import { formatDate } from '../../../helpers/date'
+import { Post } from '../../../models/experience'
 
 
 interface Props {
@@ -28,11 +8,6 @@ interface Props {
 }
 
 const PublicItem: React.FC<Props> = ({ post }) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' }).format(date);
-  };
-
   post.subTitle = post.company || post.school;
   post.title = post.position || post.grade;
 
@@ -49,9 +24,9 @@ const PublicItem: React.FC<Props> = ({ post }) => {
             </div>
           </h3>
           <p className="leading-relaxed text-base">
-           {formatDate(post.startDate.toString())} - {post.current ? 'Present' : formatDate(post.endDate.toString())}
+            {formatDate(post.startDate.toString())} - {post.current ? 'Present' : formatDate(post.endDate.toString())}
           </p>
-          <p className="leading-relaxed text-base" style={{whiteSpace: "pre-line"}}>
+          <p className="leading-relaxed text-base" style={{ whiteSpace: "pre-line" }}>
             {post.description}
           </p>
         </div>

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import PublicItem, {Post} from './Item.client';
+import React from 'react';
+import PublicItem from './Item';
+import { Post } from '../../../models/experience'
 
 interface Props {
   userId: string;
@@ -8,21 +9,28 @@ interface Props {
   endpoint: string;
 }
 
-const PublicListing: React.FC<Props> = ({ userId,endpoint, mainTitle, subTitle }) => {
-  const [postsList, setPostsList] = useState<Post[]>([]); // Initialize state
+export default async function PublicListing({ userId, endpoint, mainTitle, subTitle }: Props) {
 
-  useEffect(() => {
-    async function getData() {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/public/${endpoint}/${userId}`);
-      if (!res.ok) {
-        throw new Error(`Failed to fetch ${endpoint} data`);
-      }
-      const data = await res.json();
-      setPostsList(data);
-    }
+  async function getData() {
+    return fetch(`${process.env.NEXT_API_URL}/public/${endpoint}/${userId}`,
+      {
+        next: {
+          revalidate: 30,
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(response.statusText)
+        }
+        return response.json()
+      })
+  }
 
-    getData();
-  }, [userId, endpoint]);
+
+  const postsList = await getData();
+
+
+
 
   return (
     <section className="text-gray-800 body-font my-40">
@@ -40,5 +48,3 @@ const PublicListing: React.FC<Props> = ({ userId,endpoint, mainTitle, subTitle }
     </section>
   )
 }
-
-export default PublicListing;

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image'
+import { Skill } from '../../../models/skill'
 
 interface Props {
   userId: string;
@@ -7,26 +8,26 @@ interface Props {
   subTitle: string;
 }
 
-interface SkillItem {
-  id: string;
-  name: string;
-  icon: {
-    url: string;
-  };
-}
 
-const SkillsListing: React.FC<Props> = ({ userId, mainTitle, subTitle }) => {
-  const [skillsList, setSkillsList] = useState<SkillItem[]>([]);
+export default async function SkillsListing({ userId, mainTitle, subTitle }: Props) {
 
-  useEffect(() => {
-    const getSkills = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/public/skill/${userId}`);
-      const data = await res.json();
-      setSkillsList(data);
-    }
+  async function getSkills() {
+    return fetch(`${process.env.NEXT_API_URL}/public/skill/${userId}`,
+      {
+        next: {
+          revalidate: 30,
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(response.statusText)
+        }
+        return response.json()
+      })
+  }
 
-    getSkills();
-  }, [userId]);
+  const skillsList = await getSkills();
+
 
   return (
     <section className="text-gray-800 body-font my-40">
@@ -36,16 +37,14 @@ const SkillsListing: React.FC<Props> = ({ userId, mainTitle, subTitle }) => {
           {subTitle && <h3 className="sm:text-3xl text-2xl font-medium title-font dark:text-gray-300">{subTitle}</h3>}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2 lg:gap-6">
-          {skillsList.map(skill => (
+          {skillsList.map((skill: Skill) => (
             <div key={skill.id} className="flex flex-col items-center p-3 bg-gray-200 dark:bg-neutral-800 rounded">
-              {skill.icon && <Image className="w-16 h-16" src={skill.icon.url} alt={skill.name} />}
+              {skill.icon && <Image className="w-16 h-16" src={skill.icon.url} alt={skill.name} width={64} height={64} />}
               <p className="mt-2 text-lg font-semibold text-gray-600 dark:text-gray-200">{skill.name}</p>
             </div>
           ))}
         </div>
       </div>
-    </section>
+    </section >
   )
 }
-
-export default SkillsListing;
