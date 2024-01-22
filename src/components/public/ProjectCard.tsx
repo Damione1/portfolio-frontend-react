@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatDate } from '../../../helpers/date'
-import { ProjectPost } from '../../../models/project'
+import { ProjectPost } from '../../../types/project'
 
 interface ProjectCardProps {
     project: ProjectPost;
@@ -19,7 +19,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
     }
 
     return (
-        <div key={project._id} className="overflow-hidden shadow-lg rounded-lg h-90 w-100 sm:w-80 md:w-100 cursor-pointer m-auto">
+        <div key={project._id} className="overflow-hidden shadow-lg rounded-lg h-90 w-100 sm:w-80 md:w-100 cursor-pointer m-auto bg-white dark:bg-boxdark">
             <Link href={`/project/${project.slug}`} className="w-full block h-full">
                 <Image alt="blog photo" src={getPostThumbnail(project)} className="max-h-40 w-full object-cover" width={320} height={160} />
                 <div className="dark:bg-neutral-800 w-full p-4">

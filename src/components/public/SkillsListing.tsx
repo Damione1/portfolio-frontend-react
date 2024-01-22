@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image'
-import { Skill } from '../../../models/skill'
+import { Skill } from '../../../types/skill'
 
 interface Props {
   userId: string;
@@ -38,7 +38,7 @@ export default async function SkillsListing({ userId, mainTitle, subTitle }: Pro
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2 lg:gap-6">
           {skillsList.map((skill: Skill) => (
-            <div key={skill.id} className="flex flex-col items-center p-3 bg-gray-200 dark:bg-neutral-800 rounded">
+            <div key={skill.id} className="flex flex-col items-center p-3 bg-white dark:bg-boxdark rounded">
               {skill.icon && <Image className="w-16 h-16" src={skill.icon.url} alt={skill.name} width={64} height={64} />}
               <p className="mt-2 text-lg font-semibold text-gray-600 dark:text-gray-200">{skill.name}</p>
             </div>

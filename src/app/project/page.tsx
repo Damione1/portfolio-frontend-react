@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { formatDate } from '../../../helpers/date'
 import ProjectCard from '../../components/public/ProjectCard'
-import { ProjectPost } from '../../../models/project'
+import { ProjectPost } from '../../../types/project'
 import type { Metadata } from "next";
 
 

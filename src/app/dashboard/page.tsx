@@ -1,9 +1,15 @@
+import ECommerce from "@/components/Dashboard/E-commerce";
+import { Metadata } from "next";
 
-export default function Dashboard() {
+export const metadata: Metadata = {
+    title: "Damien Goehrig - Dashboard",
+    description: "Dashboard",
+};
+
+export default function Home() {
     return (
-        <div className="dashboard">
-            <h1>Dashboard</h1>
-        </div>
-
-    )
+        <>
+            <ECommerce />
+        </>
+    );
 }

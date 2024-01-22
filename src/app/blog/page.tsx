@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatDate } from '../../../helpers/date'
-import { BlogPost } from '../../../models/blog'
+import { BlogPost } from '../../../types/blog'
 import type { Metadata } from "next";
 
 
@@ -59,7 +59,7 @@ export default async function BlogListing() {
           {postsList.map((blogPost: BlogPost) => (
             <div
               key={blogPost._id}
-              className="overflow-hidden shadow-lg rounded-lg h-90 w-100 sm:w-80 md:w-100 cursor-pointer m-auto"
+              className="overflow-hidden shadow-lg rounded-lg h-90 w-100 sm:w-80 md:w-100 cursor-pointer m-auto bg-white dark:bg-boxdark"
             >
               <Link href={`/blog/${blogPost.slug}`} className="w-full block h-full">
 

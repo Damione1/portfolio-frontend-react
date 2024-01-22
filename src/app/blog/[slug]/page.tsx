@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import { BlogPost } from '../../../../models/blog'
+import { BlogPost } from '../../../../types/blog'
 
 async function getPost(slug: string) {
   const userId = process.env.NEXT_USER_ID || '1';

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link'
-import { ProjectPost } from '../../../models/project'
+import { ProjectPost } from '../../../types/project'
 import ProjectCard from '../../components/public/ProjectCard'
 
 interface Props {

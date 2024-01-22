@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import { ProjectPost } from '../../../../models/project'
+import { ProjectPost } from '../../../../types/project'
 import Link from 'next/link'
 
 async function getProject(slug: string) {
