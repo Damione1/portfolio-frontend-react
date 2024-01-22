@@ -12,7 +12,7 @@ const PublicItem: React.FC<Props> = ({ post }) => {
   post.title = post.position || post.grade;
 
   return (
-    <div className="p-4 w-full lg:w-1/3 sm:w-1/2 flex flex-col bg-white dark:bg-boxdark">
+    <div className="p-4 w-full lg:w-1/3 sm:w-1/2 flex flex-col">
       <div className="flex-grow border-2 rounded-lg border-gray-200 dark:text-gray-300 border-opacity-50 p-8 sm:flex-row flex-col">
         <div className="flex-grow">
           <h3 className="mb-3">
