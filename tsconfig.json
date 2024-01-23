@@ -32,7 +32,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/not-found.tsx.old"
+    "src/app/not-found.tsx.old",
+    "src/app/dashboard/auth/layout.tsx",
+    "src/app/auth/layout.tsx"
   ],
   "exclude": [
     "node_modules"

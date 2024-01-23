@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image'
-import { Skill } from '../../../types/skill'
+import { Skill } from '../../types/skill'
 
 interface Props {
   userId: string;

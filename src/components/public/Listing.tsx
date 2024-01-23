@@ -1,6 +1,6 @@
 import React from 'react';
 import PublicItem from './Item';
-import { Post } from '../../../types/experience'
+import { Post } from '../../types/experience'
 
 interface Props {
   userId: string;

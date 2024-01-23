@@ -28,7 +28,7 @@ export default async function BlogListing() {
   async function getPosts() {
     return fetch(`${process.env.NEXT_API_URL}/public/blogpost/${userId}`, {
       next: {
-        revalidate: 30,
+        revalidate: 0,
       },
     })
       .then(response => {

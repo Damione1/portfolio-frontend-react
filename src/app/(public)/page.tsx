@@ -1,7 +1,7 @@
-import HeadTitle from '../components/public/HeadTitle'
-import Listing from '../components/public/Listing'
-import SkillsListing from '../components/public/SkillsListing'
-import ProjectsListing from '../components/public/ProjectsListing'
+import HeadTitle from '../../components/public/HeadTitle'
+import Listing from '../../components/public/Listing'
+import SkillsListing from '../../components/public/SkillsListing'
+import ProjectsListing from '../../components/public/ProjectsListing'
 
 export default function Home() {
   const userId = process.env.NEXT_USER_ID || '1';

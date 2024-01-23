@@ -1,67 +1,38 @@
-'use client';
-
-import React, { FormEvent, useState } from "react";
+"use client"
+import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 import { signIn } from "next-auth/react";
-import Router from "next/router";
-
+import { redirect } from "next/navigation";
 
 export default function Login() {
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  const onSubmit = async (formData: FormData) => {
+    const email = formData.get('email');
+    const password = formData.get('password');
 
-    const formData = new FormData(event.currentTarget)
-    const email = formData.get('email')
-    const password = formData.get('password')
-
-    const response = await signIn("credentials", {
+    const result = await signIn('credentials', {
       redirect: false,
       email: email,
       password: password,
     });
 
-    // Check for errors
-    if (response?.error) {
-      alert(response.error);
+    if (!result?.error) {
+      redirect('/dashboard')
     } else {
-      Router.push('/dashboard')
+      console.log("Login error", result.error);
     }
-  }
-
+  };
 
 
   return (
-    <>
+    <div>
       <Breadcrumb pageName="Sign In" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
-              <Link className="mb-5.5 inline-block" href="/">
-                <Image
-                  className="hidden dark:block"
-                  src={"/images/logo/logo.svg"}
-                  alt="Logo"
-                  width={176}
-                  height={32}
-                />
-                <Image
-                  className="dark:hidden"
-                  src={"/images/logo/logo-dark.svg"}
-                  alt="Logo"
-                  width={176}
-                  height={32}
-                />
-              </Link>
-
-              <p className="2xl:px-20">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                suspendisse.
-              </p>
 
               <span className="mt-15 inline-block">
                 <svg
@@ -194,9 +165,7 @@ export default function Login() {
                 Sign In to the Dashboard
               </h2>
 
-
-
-              <form onSubmit={onSubmit}>
+              <form action={onSubmit}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
@@ -275,7 +244,7 @@ export default function Login() {
                 <div className="mt-6 text-center">
                   <p>
                     Don’t have any account?{" "}
-                    <Link href="/hashboard/auth/signup" className="text-primary">
+                    <Link href="/auth/signup" className="text-primary">
                       Sign Up
                     </Link>
                   </p>
@@ -285,6 +254,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

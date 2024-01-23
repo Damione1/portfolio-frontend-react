@@ -8,7 +8,7 @@ async function getProject(slug: string) {
   const res = await fetch(`${process.env.NEXT_API_URL}/public/project/${userId}?field=slug&value=${slug}`,
     {
       next: {
-        revalidate: 30,
+        revalidate: 0,
       },
     })
     .then(response => {

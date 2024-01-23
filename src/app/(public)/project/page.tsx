@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatDate } from '../../../helpers/date'
-import ProjectCard from '../../components/public/ProjectCard'
+import ProjectCard from '../../../components/public/ProjectCard'
 import { ProjectPost } from '../../../types/project'
 import type { Metadata } from "next";
 
@@ -18,7 +18,7 @@ export default async function ProjectListing() {
   async function getProjects() {
     return fetch(`${process.env.NEXT_API_URL}/public/project/${userId}`, {
       next: {
-        revalidate: 30,
+        revalidate: 0,
       },
     })
       .then(response => {

@@ -4,7 +4,6 @@ export interface ProjectPost {
     _id: string
     title: string
     content: string
-    link: string
     images: Image[]
     tags: string[]
     stack: string[]

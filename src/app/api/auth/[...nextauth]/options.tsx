@@ -1,25 +1,25 @@
 import { randomBytes, randomUUID } from "crypto";
-import { NextAuthOptions, User as NextAuthUser } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import nextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
 
-declare module 'next-auth' {
-    interface Session {
-        token: JWT;
-        id: string;
-        name: string;
+declare module "next-auth" {
+    interface User {
+        id: number;
         email: string;
-        expires_at: string | number;
-        refresh_token: string;
+        name: string;
+        role: string;
+        accessToken: string;
+        refreshToken: string;
+        accessTokenExpires: number;
+    }
+
+    interface Session extends DefaultSession {
+        user: User;
+        expires: string;
+        error: string;
     }
 }
 
-interface ExtendedUser extends NextAuthUser {
-    token: string;
-    expires_at: string | number;
-    refresh_token: string;
-}
-
-export const options: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
     providers: [
         {
             id: "credentials",
@@ -30,6 +30,7 @@ export const options: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
+                console.log("Authorizing through the API")
                 const res = await fetch(
                     `${process.env.NEXT_API_URL}/auth/login`,
                     {
@@ -42,7 +43,14 @@ export const options: NextAuthOptions = {
                 );
                 const user = await res.json();
                 if (res.ok && user) {
-                    console.log("user", user);
+                    console.log("Getting token")
+                    console.log("Access token", user.token)
+                    console.log("Refresh token", user.refresh_token)
+                    console.log("Expires in", user.expires_in)
+                    //mapping the user response to the user object expected by next-auth
+                    user.accessToken = user.token;
+                    user.refreshToken = user.refresh_token;
+                    user.accessTokenExpires = Date.now() + user.expires_in * 1000;
                     return user
                 }
                 return null;
@@ -50,101 +58,92 @@ export const options: NextAuthOptions = {
         },
     ],
     callbacks: {
-        async session({ session, token, user }) {
-            // Check if the token is expired
-            const now = new Date();
-            if (typeof token.expires_at === 'string' || typeof token.expires_at === 'number') {
-                const expiryDate = new Date(token.expires_at);
-                if (now > expiryDate) {
-                    // Token is expired, refresh it
-                    try {
-                        const res = await fetch(`${process.env.NEXT_API_URL}/auth/refreshToken`, {
-                            method: "POST",
-                            body: JSON.stringify({ refresh_token: token.refresh_token }),
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                        });
+        async jwt({ token, user, session }) {
+            if (user) {
+                token.accessToken = user.accessToken;
+                token.refreshToken = user.refreshToken;
+                token.accessTokenExpires = user.accessTokenExpires;
+                token.role = user.role;
+                token.id = user.id;
+            }
 
-                        const data = await res.json();
-                        if (res.ok && data) {
-                            session.token = data.token;
-                            session.expires_at = data.expires_at;
-                            return session;
-                        }
-                    } catch (error) {
-                        console.error("Failed to refresh token:", error);
-                    }
+            // If the access token has expired
+            if (token.accessTokenExpires && (token.accessTokenExpires as number) < Date.now()) {
+
+                // Get a new token
+                const refreshedToken = await refreshAccessToken(token.refreshToken as string);
+
+                if (refreshedToken.error) {
+                    // handle error according to your need
+                    console.log(refreshedToken.error);
+                } else {
+                    token.accessToken = refreshedToken.accessToken;
+                    token.refreshToken = refreshedToken.refreshToken;
+                    token.accessTokenExpires = refreshedToken.accessTokenExpires;
                 }
             }
 
-            if (!user) {
-                try {
-                    const res = await fetch(`${process.env.NEXT_API_URL}/auth/getCurrentUser`, {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    });
-
-                    const data = await res.json();
-                    if (res.ok && data) {
-                        session.id = data.user._id;
-                        session.name = `${data.user.firstName} ${data.user.lastName}`;
-                        session.email = data.user.email;
-                        return session;
-                    }
-                }
-                catch (error) {
-                    console.error("Failed to get current user:", error);
-                }
-            }
-
-            // If the token is not expired, set the session token
-            session.token = token;
-
-            return session;
-        },
-        async jwt({ token, user, account, profile }) {
-            const extendedUser = user as ExtendedUser;
-            if (extendedUser) {
-                token = { ...token, id: extendedUser.id, name: extendedUser?.name, email: extendedUser.email, token: extendedUser.token, expires_at: extendedUser.expires_at, refresh_token: extendedUser.refresh_token };
-            }
             return token;
         },
+
+        //  The session receives the token from JWT
+        async session({ session, token, user }) {
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    accessToken: token.accessToken as string,
+                    refreshToken: token.refreshToken as string,
+                    role: token.role,
+                    id: token.id,
+                },
+                error: token.error,
+            };
+        },
         async redirect({ url, baseUrl }) {
-            console.log("redirect", url, baseUrl);
             return url
         },
     },
     session: {
-        // Choose how you want to save the user session.
-        // The default is `"jwt"`, an encrypted JWT (JWE) stored in the session cookie.
-        // If you use an `adapter` however, we default it to `"database"` instead.
-        // You can still force a JWT session by explicitly defining `"jwt"`.
-        // When using `"database"`, the session cookie will only contain a `sessionToken` value,
-        // which is used to look up the session in the database.
-        //strategy: "database",
-
-        // Seconds - How long until an idle session expires and is no longer valid.
         maxAge: 30 * 24 * 60 * 60, // 30 days
-
-        // Seconds - Throttle how frequently to write to database to extend a session.
-        // Use it to limit write operations. Set to 0 to always update the database.
-        // Note: This option is ignored if using JSON Web Tokens
         updateAge: 24 * 60 * 60, // 24 hours
-
-        // The session token is usually either a random UUID or string, however if you
-        // need a more customized session token string, you can define your own generate function.
         generateSessionToken: () => {
             return randomUUID?.() ?? randomBytes(32).toString("hex")
         }
     },
     pages: {
-        signIn: '/dashboard/auth/signin',
-        //signOut: '/auth/signout',
-        error: '/auth/error', // Error code passed in query string as ?error=
-        verifyRequest: '/auth/verify-request', // (used for check email message)
-        newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
+        signIn: '/auth',
     }
 };
+
+async function refreshAccessToken(refreshToken: string) {
+    console.log("refreshing token")
+    try {
+        console.log("refreshing token from", refreshToken)
+        const res = await fetch(`${process.env.NEXT_API_URL}/auth/refreshToken`, {
+            method: "POST",
+            body: JSON.stringify({ refresh_token: refreshToken }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const response = await res.json();
+
+        return {
+            accessToken: response.access_token,
+            accessTokenExpires: Date.now() + response.expires_in * 1000,
+            refreshToken: response.refresh_token,
+        }
+    } catch (error) {
+        console.log("error refreshing token", error)
+        return {
+            error: "RefreshAccessTokenError",
+        }
+    }
+
+}
