@@ -1,45 +1,37 @@
-import React from "react";
+'use client';
+
+import React, { FormEvent, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { Metadata } from "next";
 
-
-import { Router } from "next/router";
 import { signIn } from "next-auth/react";
-export const metadata: Metadata = {
-  title: "Signin Page | Next.js E-commerce Dashboard Template",
-  description: "This is Signin page for TailAdmin Next.js",
-  // other metadata
-};
+import Router from "next/router";
+
 
 export default function Login() {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
 
-  async function handleLogin(formData: FormData) {
-    //   try {
-    //     await signIn('credentials', {
-    //       email: formData.get('email'),
-    //       password: formData.get('password'),
-    //       callbackUrl: `${window.location.origin}/dashboard`
-    //     })
-    //   } catch (error) {
-    //     if (error) {
-    //       switch (error.type) {
-    //         case 'CredentialsSignin':
-    //           return 'Invalid credentials.'
-    //         default:
-    //           return 'Something went wrong.'
-    //       }
-    //     }
-    //     throw error
-    //   }
+    const formData = new FormData(event.currentTarget)
+    const email = formData.get('email')
+    const password = formData.get('password')
 
+    const response = await signIn("credentials", {
+      redirect: false,
+      email: email,
+      password: password,
+    });
 
-
-    // }
+    // Check for errors
+    if (response?.error) {
+      alert(response.error);
+    } else {
+      Router.push('/dashboard')
+    }
+  }
 
 
-  };
 
   return (
     <>
@@ -198,12 +190,13 @@ export default function Login() {
 
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
             <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <span className="mb-1.5 block font-medium">Start for free</span>
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                Sign In to TailAdmin
+                Sign In to the Dashboard
               </h2>
 
-              <form action={handleLogin}>
+
+
+              <form onSubmit={onSubmit}>
                 <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
