@@ -34,7 +34,8 @@
     ".next/types/**/*.ts",
     "src/app/not-found.tsx.old",
     "src/app/dashboard/auth/layout.tsx",
-    "src/app/auth/layout.tsx"
+    "src/app/auth/layout.tsx",
+    "src/app/error.tsx.old"
   ],
   "exclude": [
     "node_modules"

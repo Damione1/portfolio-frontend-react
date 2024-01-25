@@ -10,9 +10,27 @@ export type PostListItem = {
 
 const Listing = ({ posts }: { posts: PostListItem[] }) => {
   const deleteThisProject = async (id: string) => {
-    const projectDeleted = await deleteProject(id);
-    const postsUpdated = posts.filter((post) => post._id !== id);
+    const { error } = await deleteProject(id);
+    if (error) {
+      console.error("project not found", error);
+      return;
+    }
+    posts.filter((post) => post._id !== id);
   }
+
+
+  if (posts.length === 0) {
+    return (
+      <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <div className="max-w-full overflow-x-auto">
+          <div className="w-full text-center">
+            <h3 className="text-black dark:text-white">No projects found</h3>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
 
 
   return (

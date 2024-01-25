@@ -157,7 +157,7 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={() => signOut()}>
+        <Link className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" href="/api/auth/signout">
           <svg
             className="fill-current"
             width="22"
@@ -176,7 +176,7 @@ const DropdownUser = () => {
             />
           </svg>
           Log Out
-        </button >
+        </Link >
       </div>
       {/* <!-- Dropdown End --> */}
     </div >

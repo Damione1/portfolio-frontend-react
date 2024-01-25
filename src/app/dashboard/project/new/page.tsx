@@ -7,6 +7,7 @@ import { createProject } from "../_operations";
 
 export default function AdminProjectCreate() {
   const onSubmit = async (formData: FormData) => {
+    console.log("submitting form data");
     const projectPayload = {
       title: formData.get('title') as string,
       content: formData.get('content') as string,
@@ -19,14 +20,17 @@ export default function AdminProjectCreate() {
     } as ProjectPost;
 
 
-    const projectUpdated = await createProject(projectPayload);
-    redirect(`/dashboard/project/${projectUpdated?._id}`);
+    const { project, error } = await createProject(projectPayload);
+    if (error) {
+      console.error("project creation failed", error);
+    } else {
+      redirect(`/dashboard/project/${project?._id}`);
+    }
   };
 
 
   return (
-
-    <>
+    <div>
       <Breadcrumb pageName="Create a new project" />
 
       <div className="grid grid-cols-1 gap-9">
@@ -88,6 +92,7 @@ export default function AdminProjectCreate() {
                     <input
                       type="date"
                       name="date"
+                      value={new Date().toISOString().split('T')[0]}
                       className="custom-input-date custom-input-date-1 w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
                   </div>
@@ -104,15 +109,16 @@ export default function AdminProjectCreate() {
                   />
                 </div>
 
-                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+                <button type="submit" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray" formAction={onSubmit}>
                   Create Project
                 </button>
+
               </div>
             </div>
           </form>
         </div>
       </div>
-    </>
+    </div>
 
   );
 

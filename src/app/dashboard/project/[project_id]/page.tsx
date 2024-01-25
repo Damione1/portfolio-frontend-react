@@ -24,16 +24,17 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
 
   useEffect(() => {
     (async () => {
-      if (!params.project_id) {
+      console.log("fetching project", params);
+      if (params === undefined || params.project_id === undefined) {
         notFound();
-      } else {
-        const { project, error } = await getProjectById(params.project_id);
-        if (error || !project) {
-          console.error("project not found", error);
-          notFound();
-        }
-        setProject(project);
       }
+      const { project, error } = await getProjectById(params.project_id);
+      if (error || !project) {
+        console.error("project not found", error);
+        notFound();
+      }
+      setProject(project);
+
     })();
   });
 
@@ -51,15 +52,19 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
     } as ProjectPost;
 
 
-    const projectUpdated = await updateProject(projectPayload);
-    revalidatePath(`/dashboard/project/${projectUpdated?._id}`);
-    return projectUpdated as ProjectPost;
+    const { project, error } = await updateProject(projectPayload);
+    if (error) {
+      console.error("project not found", error);
+      return;
+    }
+    revalidatePath(`/dashboard/project/${project?._id}`);
+    return project as ProjectPost;
   };
 
 
   return (
 
-    <>
+    <div>
       <Breadcrumb pageName="Edit Project" />
 
       <div className="grid grid-cols-1 gap-9">
@@ -143,15 +148,16 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
                   />
                 </div>
 
-                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+                <button type="submit" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
                   Update Project
                 </button>
+
               </div>
             </div>
           </form>
         </div>
       </div>
-    </>
+    </div>
 
   );
 

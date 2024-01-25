@@ -43,10 +43,6 @@ export const authOptions: NextAuthOptions = {
                 );
                 const user = await res.json();
                 if (res.ok && user) {
-                    console.log("Getting token")
-                    console.log("Access token", user.token)
-                    console.log("Refresh token", user.refresh_token)
-                    console.log("Expires in", user.expires_in)
                     //mapping the user response to the user object expected by next-auth
                     user.accessToken = user.token;
                     user.refreshToken = user.refresh_token;
@@ -75,11 +71,15 @@ export const authOptions: NextAuthOptions = {
 
                 if (refreshedToken.error) {
                     // handle error according to your need
-                    console.log(refreshedToken.error);
+                    console.log("error refreshing token", refreshedToken.error);
                 } else {
                     token.accessToken = refreshedToken.accessToken;
                     token.refreshToken = refreshedToken.refreshToken;
                     token.accessTokenExpires = refreshedToken.accessTokenExpires;
+
+                    user.accessToken = refreshedToken.accessToken;
+                    user.refreshToken = refreshedToken.refreshToken;
+                    user.accessTokenExpires = refreshedToken.accessTokenExpires as number;
                 }
             }
 
@@ -117,7 +117,6 @@ export const authOptions: NextAuthOptions = {
 };
 
 async function refreshAccessToken(refreshToken: string) {
-    console.log("refreshing token")
     try {
         console.log("refreshing token from", refreshToken)
         const res = await fetch(`${process.env.NEXT_API_URL}/auth/refreshToken`, {
@@ -133,6 +132,7 @@ async function refreshAccessToken(refreshToken: string) {
         }
 
         const response = await res.json();
+        console.log("Access token refreshed", response.access_token)
 
         return {
             accessToken: response.access_token,
@@ -145,5 +145,4 @@ async function refreshAccessToken(refreshToken: string) {
             error: "RefreshAccessTokenError",
         }
     }
-
 }
