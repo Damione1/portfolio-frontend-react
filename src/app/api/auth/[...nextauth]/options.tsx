@@ -1,23 +1,8 @@
+import { User } from "@/types/user";
 import { randomBytes, randomUUID } from "crypto";
-import nextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
-
-declare module "next-auth" {
-    interface User {
-        id: number;
-        email: string;
-        name: string;
-        role: string;
-        accessToken: string;
-        refreshToken: string;
-        accessTokenExpires: number;
-    }
-
-    interface Session extends DefaultSession {
-        user: User;
-        expires: string;
-        error: string;
-    }
-}
+import { NextAuthOptions, Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
+import { signOut } from "next-auth/react";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -41,61 +26,63 @@ export const authOptions: NextAuthOptions = {
                         },
                     }
                 );
-                const user = await res.json();
-                if (res.ok && user) {
-                    //mapping the user response to the user object expected by next-auth
-                    user.accessToken = user.token;
-                    user.refreshToken = user.refresh_token;
-                    user.accessTokenExpires = Date.now() + user.expires_in * 1000;
-                    return user
+                const userResponse = await res.json();
+                if (res.ok && userResponse) {
+                    return {
+                        accessToken: userResponse.token,
+                        refreshToken: userResponse.refresh_token,
+                        expiresAt: Date.now() + userResponse.expires_in * 1000,
+                    };
                 }
                 return null;
             },
         },
     ],
     callbacks: {
-        async jwt({ token, user, session }) {
+        async jwt({ token, user }) {
             if (user) {
-                token.accessToken = user.accessToken;
-                token.refreshToken = user.refreshToken;
-                token.accessTokenExpires = user.accessTokenExpires;
-                token.role = user.role;
-                token.id = user.id;
+                token.backendTokens = {
+                    accessToken: user?.accessToken,
+                    refreshToken: user?.refreshToken,
+                    expiresAt: user?.expiresAt,
+                } as JWT["backendTokens"];
             }
 
             // If the access token has expired
-            if (token.accessTokenExpires && (token.accessTokenExpires as number) < Date.now()) {
+            if (token.backendTokens.expiresAt && (token.backendTokens.expiresAt as number <= Date.now())) {
 
+                if (!token.backendTokens.refreshToken) {
+                    // handle error according to your needs
+                    console.log("no refresh token, logging out");
+                    signOut();
+                    return;
+                }
                 // Get a new token
-                const refreshedToken = await refreshAccessToken(token.refreshToken as string);
+                const refreshedToken = await refreshAccessToken(token.backendTokens.accessToken);
 
                 if (refreshedToken.error) {
                     // handle error according to your need
                     console.log("error refreshing token", refreshedToken.error);
                 } else {
-                    token.accessToken = refreshedToken.accessToken;
-                    token.refreshToken = refreshedToken.refreshToken;
-                    token.accessTokenExpires = refreshedToken.accessTokenExpires;
-
-                    user.accessToken = refreshedToken.accessToken;
-                    user.refreshToken = refreshedToken.refreshToken;
-                    user.accessTokenExpires = refreshedToken.accessTokenExpires as number;
+                    token.backendTokens.accessToken = refreshedToken.accessToken as string;
+                    token.backendTokens.expiresAt = refreshedToken.accessTokenExpires as number;
                 }
             }
 
             return token;
         },
-
-        //  The session receives the token from JWT
-        async session({ session, token, user }) {
+        async session({ session, token }) {
             return {
                 ...session,
                 user: {
                     ...session.user,
-                    accessToken: token.accessToken as string,
-                    refreshToken: token.refreshToken as string,
                     role: token.role,
                     id: token.id,
+                },
+                backendTokens: {
+                    accessToken: token.backendTokens.accessToken,
+                    refreshToken: token.backendTokens.refreshToken,
+                    expiresAt: token.backendTokens.expiresAt,
                 },
                 error: token.error,
             };
@@ -135,9 +122,9 @@ async function refreshAccessToken(refreshToken: string) {
         console.log("Access token refreshed", response.access_token)
 
         return {
-            accessToken: response.access_token,
-            accessTokenExpires: Date.now() + response.expires_in * 1000,
-            refreshToken: response.refresh_token,
+            accessToken: response.access_token as string,
+            accessTokenExpires: (Date.now() + response.expires_in * 1000) as number,
+            refreshToken: response.refresh_token as string,
         }
     } catch (error) {
         console.log("error refreshing token", error)

@@ -7,7 +7,7 @@ import { signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 export default function Login() {
-  const onSubmit = async (formData: FormData) => {
+  async function onSubmit(formData: FormData) {
     const email = formData.get('email');
     const password = formData.get('password');
 

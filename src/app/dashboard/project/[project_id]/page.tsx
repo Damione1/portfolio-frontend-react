@@ -38,7 +38,7 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
     })();
   });
 
-  const onSubmit = async (formData: FormData) => {
+  async function onSubmit(formData: FormData) {
     const projectPayload = {
       _id: params.project_id,
       title: formData.get('title') as string,

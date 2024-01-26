@@ -6,8 +6,7 @@ import { Image } from "@/types/media";
 import { createProject } from "../_operations";
 
 export default function AdminProjectCreate() {
-  const onSubmit = async (formData: FormData) => {
-    console.log("submitting form data");
+  async function onSubmit(formData: FormData) {
     const projectPayload = {
       title: formData.get('title') as string,
       content: formData.get('content') as string,
@@ -109,7 +108,7 @@ export default function AdminProjectCreate() {
                   />
                 </div>
 
-                <button type="submit" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray" formAction={onSubmit}>
+                <button type="submit" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
                   Create Project
                 </button>
 
@@ -118,7 +117,7 @@ export default function AdminProjectCreate() {
           </form>
         </div>
       </div>
-    </div>
+    </div >
 
   );
 

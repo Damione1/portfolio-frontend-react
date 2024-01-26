@@ -13,7 +13,7 @@ export async function getProjects() {
                     revalidate: 0,
                 },
                 headers: {
-                    'Authorization': `Bearer ${session?.user?.accessToken}`
+                    'Authorization': `Bearer ${session?.backendTokens?.accessToken}`
                 }
             })
 
@@ -48,7 +48,7 @@ export async function getProjectById(projectId: String) {
                     revalidate: 0,
                 },
                 headers: {
-                    'Authorization': `Bearer ${session?.user?.accessToken}`
+                    'Authorization': `Bearer ${session?.backendTokens?.accessToken}`
                 }
             });
 
@@ -69,6 +69,7 @@ export async function getProjectById(projectId: String) {
 }
 
 export async function createProject(payload: ProjectPost) {
+    console.log("payload", payload)
     const session = await getServerSession(authOptions);
     try {
         const response = await fetch(`${process.env.NEXT_API_URL}/projects`,
@@ -76,7 +77,7 @@ export async function createProject(payload: ProjectPost) {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
-                    'Authorization': `Bearer ${session?.user?.accessToken}`,
+                    'Authorization': `Bearer ${session?.backendTokens?.accessToken}`,
                     'Content-Type': 'application/json'
                 }
             })
@@ -105,7 +106,7 @@ export async function updateProject(payload: ProjectPost) {
                 method: 'PATCH',
                 body: JSON.stringify(payload),
                 headers: {
-                    'Authorization': `Bearer ${session?.user?.accessToken}`,
+                    'Authorization': `Bearer ${session?.backendTokens?.accessToken}`,
                     'Content-Type': 'application/json'
                 }
             })
@@ -133,7 +134,7 @@ export async function deleteProject(projectId: string) {
             {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${session?.user?.accessToken}`,
+                    'Authorization': `Bearer ${session?.backendTokens?.accessToken}`,
                     'Content-Type': 'application/json'
                 }
             })
