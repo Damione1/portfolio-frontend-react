@@ -1,17 +1,5 @@
 "use client";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import CheckboxFive from "@/components/Checkboxes/CheckboxFive";
-import CheckboxFour from "@/components/Checkboxes/CheckboxFour";
-import CheckboxOne from "@/components/Checkboxes/CheckboxOne";
-import CheckboxThree from "@/components/Checkboxes/CheckboxThree";
-import CheckboxTwo from "@/components/Checkboxes/CheckboxTwo";
-import SwitcherFour from "@/components/Switchers/SwitcherFour";
-import SwitcherOne from "@/components/Switchers/SwitcherOne";
-import SwitcherThree from "@/components/Switchers/SwitcherThree";
-import SwitcherTwo from "@/components/Switchers/SwitcherTwo";
-
-import { getServerSession } from "next-auth";
 import { getProjectById, updateProject } from "./../_operations";
 import { ProjectPost } from "@/types/project";
 import { revalidatePath } from "next/cache";
@@ -24,40 +12,40 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
 
   useEffect(() => {
     (async () => {
-      console.log("fetching project", params);
       if (params === undefined || params.project_id === undefined) {
         notFound();
       }
       const { project, error } = await getProjectById(params.project_id);
       if (error || !project) {
-        console.error("project not found", error);
+        window.alert(`Project not found: ${error}`);
         notFound();
+      } else {
+        setProject(project);
       }
-      setProject(project);
-
     })();
-  });
+  }, [params, params.project_id]);
+
 
   async function onSubmit(formData: FormData) {
     const projectPayload = {
-      _id: params.project_id,
       title: formData.get('title') as string,
       content: formData.get('content') as string,
-      images: [{ _id: formData.get('image.1') as string }] as Image[],
-      user: formData.get('user') as string,
-      language: formData.get('language') as string,
+      images: [] as Image[],
       slug: formData.get('slug') as string,
-      date: new Date(formData.get('date') as string).toISOString(),
       excerpt: formData.get('excerpt') as string,
+      _id: params.project_id as string
     } as ProjectPost;
 
+    const image = formData.get('image.1') as string;
+    if (image) {
+      projectPayload.images = [{ _id: image }] as Image[];
+    }
 
     const { project, error } = await updateProject(projectPayload);
     if (error) {
-      console.error("project not found", error);
+      window.alert(`Project update failed: ${error}`);
       return;
     }
-    revalidatePath(`/dashboard/project/${project?._id}`);
     return project as ProjectPost;
   };
 
@@ -124,13 +112,26 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
 
                 <div>
                   <label className="mb-3 block text-black dark:text-white">
-                    Date
+                    Created at
                   </label>
                   <div className="relative">
                     <input
-                      type="date"
-                      name="date"
-                      value={project ? new Date(project.date).toISOString().substr(0, 10) : ""}
+                      type="text"
+                      disabled
+                      value={project?.createdAt}
+                      className="custom-input-date custom-input-date-1 w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-3 block text-black dark:text-white">
+                    Updated at
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      disabled
+                      value={project?.updatedAt}
                       className="custom-input-date custom-input-date-1 w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
                   </div>

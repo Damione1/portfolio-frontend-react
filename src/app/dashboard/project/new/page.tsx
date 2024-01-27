@@ -10,18 +10,19 @@ export default function AdminProjectCreate() {
     const projectPayload = {
       title: formData.get('title') as string,
       content: formData.get('content') as string,
-      images: [{ _id: formData.get('image.1') as string }] as Image[],
-      user: formData.get('user') as string,
-      language: formData.get('language') as string,
+      images: [] as Image[],
       slug: formData.get('slug') as string,
-      date: new Date(formData.get('date') as string).toISOString(),
       excerpt: formData.get('excerpt') as string,
     } as ProjectPost;
 
+    const image = formData.get('image.1') as string;
+    if (image) {
+      projectPayload.images = [{ _id: image }] as Image[];
+    }
 
     const { project, error } = await createProject(projectPayload);
     if (error) {
-      console.error("project creation failed", error);
+      window.alert(`Project creation failed: ${error}`);
     } else {
       redirect(`/dashboard/project/${project?._id}`);
     }
@@ -81,20 +82,6 @@ export default function AdminProjectCreate() {
                     name="slug"
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                   />
-                </div>
-
-                <div>
-                  <label className="mb-3 block text-black dark:text-white">
-                    Date
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      name="date"
-                      value={new Date().toISOString().split('T')[0]}
-                      className="custom-input-date custom-input-date-1 w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                    />
-                  </div>
                 </div>
 
                 <div>

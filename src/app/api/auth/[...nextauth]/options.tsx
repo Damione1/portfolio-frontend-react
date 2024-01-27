@@ -49,8 +49,7 @@ export const authOptions: NextAuthOptions = {
             }
 
             // If the access token has expired
-            if (token.backendTokens.expiresAt && (token.backendTokens.expiresAt as number <= Date.now())) {
-
+            if (token.backendTokens.expiresAt && (token.backendTokens.expiresAt as number) <= Date.now()) {
                 if (!token.backendTokens.refreshToken) {
                     // handle error according to your needs
                     console.log("no refresh token, logging out");
@@ -58,8 +57,7 @@ export const authOptions: NextAuthOptions = {
                     return;
                 }
                 // Get a new token
-                const refreshedToken = await refreshAccessToken(token.backendTokens.accessToken);
-
+                const refreshedToken = await refreshAccessToken(token.backendTokens.refreshToken);
                 if (refreshedToken.error) {
                     // handle error according to your need
                     console.log("error refreshing token", refreshedToken.error);
@@ -119,12 +117,10 @@ async function refreshAccessToken(refreshToken: string) {
         }
 
         const response = await res.json();
-        console.log("Access token refreshed", response.access_token)
 
         return {
-            accessToken: response.access_token as string,
+            accessToken: response.token as string,
             accessTokenExpires: (Date.now() + response.expires_in * 1000) as number,
-            refreshToken: response.refresh_token as string,
         }
     } catch (error) {
         console.log("error refreshing token", error)

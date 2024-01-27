@@ -10,7 +10,9 @@ export interface ProjectPost {
     user: string
     language: string
     slug: string
-    date: string
+    createdAt: string
+    updatedAt: string
+    link: string
     __v: number
     excerpt: string
 }

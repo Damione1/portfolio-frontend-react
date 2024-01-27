@@ -32,7 +32,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                     <div className="flex items-center mt-4">
                         <div className="flex flex-col justify-between text-sm">
                             <p className="text-gray-400 dark:text-gray-300">
-                                {formatDate(project.date.toString())}
+                                {formatDate(project.createdAt.toString())}
                             </p>
                         </div>
                     </div>
