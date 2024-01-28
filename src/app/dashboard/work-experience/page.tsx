@@ -1,47 +1,46 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
-import { deleteProject, listProjects } from "./_operations";
+import { deleteWorkExperience, listWorkExperiences } from "./_operations";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { useEffect, useState } from "react";
 import { PostListItem } from "@/components/Tables/TableThree";
-import { ProjectPost } from "@/types/project";
 import { formatDate } from "@/helpers/date";
 
 
 
-export default function AdminProjectsListing() {
-  const [projects, setProjects] = useState<PostListItem[]>([]);
+export default function AdminWorkExperiencesListing() {
+  const [WorkExperiences, setWorkExperiences] = useState<PostListItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { posts, error } = await listProjects();
+      const { posts, error } = await listWorkExperiences();
       if (error) {
         window.alert(`Api error: ${error}`);
         setError(error);
       } else {
-        setProjects(posts);
+        setWorkExperiences(posts);
       }
     })();
   }, []);
 
 
-  const deleteThisProject = async (id: string) => {
-    const { error } = await deleteProject(id);
+  const deleteThisWorkExperience = async (id: string) => {
+    const { error } = await deleteWorkExperience(id);
     if (error) {
-      console.error("project not found", error);
+      console.error("WorkExperience not found", error);
       return;
     }
-    //pop the project from the list
-    const newProjects = projects.filter((project) => project._id !== id);
-    setProjects(newProjects);
+    //pop the WorkExperience from the list
+    const newWorkExperiences = WorkExperiences.filter((WorkExperience) => WorkExperience._id !== id);
+    setWorkExperiences(newWorkExperiences);
   }
 
   return (
-    <div key="admin-projects-listing">
-      <Breadcrumb pageName="Projects" />
+    <div key="admin-WorkExperiences-listing">
+      <Breadcrumb pageName="WorkExperiences" />
       <div className="flex flex-col gap-10">
         {error ? <div>Error loading posts: {error}</div> :
           <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -64,7 +63,7 @@ export default function AdminProjectsListing() {
                   </tr>
                 </thead>
                 <tbody>
-                  {projects.map((post, key) => (
+                  {WorkExperiences.map((post, key) => (
                     <tr key={key}>
                       <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                         <h5 className="font-medium text-black dark:text-white">
@@ -83,7 +82,7 @@ export default function AdminProjectsListing() {
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <div className="flex items-center space-x-3.5">
-                          <Link className="hover:text-primary" href={`/dashboard/project/${post._id}`}>
+                          <Link className="hover:text-primary" href={`/dashboard/work-experience/${post._id}`}>
                             <svg
                               className="fill-current"
                               width="18"
@@ -102,7 +101,7 @@ export default function AdminProjectsListing() {
                               />
                             </svg>
                           </Link>
-                          <button className="hover:text-primary" onClick={async () => { await deleteThisProject(post._id) }}  >
+                          <button className="hover:text-primary" onClick={async () => { await deleteThisWorkExperience(post._id) }}  >
                             <svg
                               className="fill-current"
                               width="18"
@@ -133,11 +132,11 @@ export default function AdminProjectsListing() {
                       </td>
                     </tr>
                   ))}
-                  {projects.length === 0 &&
+                  {WorkExperiences.length === 0 &&
                     <tr>
                       <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                         <h5 className="font-medium text-black dark:text-white">
-                          No projects found
+                          No WorkExperiences found
                         </h5>
                       </td>
                     </tr>
@@ -148,8 +147,8 @@ export default function AdminProjectsListing() {
           </div >
         }
       </div>
-      <Link href="/dashboard/project/new" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-        Create a new project
+      <Link href="/dashboard/work-experience/new" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+        Create a new WorkExperience
       </Link>
     </div>
   );

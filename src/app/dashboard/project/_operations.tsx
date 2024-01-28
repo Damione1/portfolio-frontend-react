@@ -4,7 +4,7 @@ import { PostListItem } from "@/components/Tables/TableThree"
 import { ProjectPost } from "@/types/project"
 import { getServerSession } from "next-auth"
 
-export async function getProjects() {
+export async function listProjects() {
     try {
         const session = await getServerSession(authOptions);
         const response = await fetch(`${process.env.NEXT_API_URL}/projects`,

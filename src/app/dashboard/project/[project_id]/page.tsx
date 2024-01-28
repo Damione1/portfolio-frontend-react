@@ -102,7 +102,7 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
                     Content
                   </label>
                   <textarea
-                    rows={6}
+                    rows={12}
                     name="content"
                     defaultValue={project?.content}
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"

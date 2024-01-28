@@ -1,11 +1,13 @@
-export interface Post {
-  id: string;
+export interface WorkExperiencePost {
+  _id: string;
   title: string;
   subTitle: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   current: boolean;
   description: string;
+  createdAt: string;
+  updatedAt: string;
 
   /** @deprecated */
   company: string;
