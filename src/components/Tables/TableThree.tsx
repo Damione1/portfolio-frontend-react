@@ -2,6 +2,8 @@ import { Package } from "../../types/package";
 
 export type PostListItem = {
   title: string;
+  createdAt: string;
+  updatedAt: string;
   _id: string;
 }
 

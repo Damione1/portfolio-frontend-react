@@ -27,6 +27,7 @@ export default async function ProjectPost({ params }: { params: { slug: string }
   const projectPost = await getProject(params.slug);
 
   function getThumbnail(images: any) {
+    console.log("Images", images);
     return images && images[0]
       ? projectPost.images[0].url
       : 'https://generative-placeholders.glitch.me/image?width=1200&height=300&style=joy-division&colors=14';
@@ -38,7 +39,7 @@ export default async function ProjectPost({ params }: { params: { slug: string }
       <div className="container px-5 py-24 mx-auto flex flex-col">
         <div className="lg:w-4/6 mx-auto">
           <div className="rounded-lg h-64 overflow-hidden">
-            <Image alt="content" className="object-cover object-center h-full w-full" src={getThumbnail(projectPost.images)} width={1200} height={300} placeholder="blur" blurDataURL={getThumbnail(projectPost.images)} />
+            <Image alt="content" className="object-cover object-center h-full w-full" src={getThumbnail(projectPost.images)} width={1200} height={300} blurDataURL={getThumbnail(projectPost.images)} />
           </div>
           <div className="flex flex-col sm:flex-row mt-10">
             <div className="sm:w-1/3 text-center sm:pr-8 sm:py-8">

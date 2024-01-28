@@ -25,6 +25,8 @@ export async function getProjects() {
         const posts: PostListItem[] = projects.map((project) => {
             return {
                 title: project.title,
+                createdAt: project.createdAt ?? "",
+                updatedAt: project.updatedAt ?? "",
                 _id: project._id
             }
         })

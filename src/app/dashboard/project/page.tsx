@@ -6,6 +6,8 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { useEffect, useState } from "react";
 import { PostListItem } from "@/components/Tables/TableThree";
+import { ProjectPost } from "@/types/project";
+import { formatDate } from "@/helpers/date";
 
 
 
@@ -51,6 +53,12 @@ export default function AdminProjectsListing() {
                       Title
                     </th>
                     <th className="py-4 px-4 font-medium text-black dark:text-white">
+                      Created At
+                    </th>
+                    <th className="py-4 px-4 font-medium text-black dark:text-white">
+                      Updated At
+                    </th>
+                    <th className="py-4 px-4 font-medium text-black dark:text-white">
                       Actions
                     </th>
                   </tr>
@@ -62,6 +70,16 @@ export default function AdminProjectsListing() {
                         <h5 className="font-medium text-black dark:text-white">
                           {post.title}
                         </h5>
+                      </td>
+                      <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                        <p className="text-black dark:text-white">
+                          {post.createdAt !== "" ? formatDate(post.createdAt.toString()) : 'N/A'}
+                        </p>
+                      </td>
+                      <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                        <p className="text-black dark:text-white">
+                          {post.updatedAt !== "" ? formatDate(post.updatedAt.toString()) : 'N/A'}
+                        </p>
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <div className="flex items-center space-x-3.5">
