@@ -1,6 +1,6 @@
 import React from 'react';
 import PublicItem from './Item';
-import { Post } from '../../types/experience'
+import { WorkExperiencePost } from '../../types/experience'
 
 interface Props {
   userId: string;
@@ -26,11 +26,7 @@ export default async function PublicListing({ userId, endpoint, mainTitle, subTi
       })
   }
 
-
-  const postsList = await getData();
-
-
-
+  const postsList = await getData() as WorkExperiencePost[];
 
   return (
     <section className="text-gray-800 body-font my-40">
@@ -40,8 +36,8 @@ export default async function PublicListing({ userId, endpoint, mainTitle, subTi
           {subTitle && <h3 className="sm:text-3xl text-2xl font-medium title-font dark:text-gray-300">{subTitle}</h3>}
         </div>
         <div className="flex flex-wrap items-stretch">
-          {postsList.map((post: Post) => (
-            <PublicItem key={post.id} post={post} />
+          {postsList.map((post) => (
+            <PublicItem key={post._id} post={post} />
           ))}
         </div>
       </div>

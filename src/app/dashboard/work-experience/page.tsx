@@ -3,7 +3,6 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 import { deleteWorkExperience, listWorkExperiences } from "./_operations";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
 import { useEffect, useState } from "react";
 import { PostListItem } from "@/components/Tables/TableThree";
 import { formatDate } from "@/helpers/date";

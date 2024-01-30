@@ -1,4 +1,4 @@
-import { Image } from './media'
+import { ImageItem } from './media'
 import { User } from './user'
 
 export interface BlogPost {
@@ -6,7 +6,7 @@ export interface BlogPost {
     title: string
     excerpt: string
     content: string
-    images: Image[]
+    images: ImageItem[]
     user: User
     language: string
     slug: string

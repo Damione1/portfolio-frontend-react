@@ -2,7 +2,7 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { ProjectPost } from "@/types/project";
 import { redirect } from 'next/navigation'
-import { Image } from "@/types/media";
+import { ImageItem } from "@/types/media";
 import { createProject } from "../_operations";
 
 export default function AdminProjectCreate() {
@@ -10,14 +10,14 @@ export default function AdminProjectCreate() {
     const projectPayload = {
       title: formData.get('title') as string,
       content: formData.get('content') as string,
-      images: [] as Image[],
+      images: [] as ImageItem[],
       slug: formData.get('slug') as string,
       excerpt: formData.get('excerpt') as string,
     } as ProjectPost;
 
     const image = formData.get('image.1') as string;
     if (image) {
-      projectPayload.images = [{ _id: image }] as Image[];
+      projectPayload.images = [{ _id: image }] as ImageItem[];
     }
 
     const { project, error } = await createProject(projectPayload);

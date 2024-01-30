@@ -1,10 +1,10 @@
-import { Image } from './media'
+import { ImageItem } from './media'
 
 export interface ProjectPost {
     _id: string
     title: string
     content: string
-    images: Image[]
+    images: ImageItem[]
     tags: string[]
     stack: string[]
     user: string

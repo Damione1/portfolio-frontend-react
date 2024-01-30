@@ -35,7 +35,7 @@
     "src/app/not-found.tsx.old",
     "src/app/dashboard/auth/layout.tsx",
     "src/app/auth/layout.tsx",
-    "src/app/api/auth/[...nextauth]/_next_auth_types.tsx",
+    "src/app/api/auth/[...nextauth]/options.tsx",
   ],
   "exclude": [
     "node_modules"

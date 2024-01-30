@@ -5,7 +5,7 @@ import { ProjectPost } from "@/types/project";
 import { revalidatePath } from "next/cache";
 import { useEffect, useState } from "react";
 import { notFound } from 'next/navigation'
-import { Image } from "@/types/media";
+import { ImageItem } from "@/types/media";
 
 export default function AdminProjectEdit({ params }: { params: { project_id: string } }) {
   const [project, setProject] = useState<ProjectPost | null>(null);
@@ -30,7 +30,7 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
     const projectPayload = {
       title: formData.get('title') as string,
       content: formData.get('content') as string,
-      images: [] as Image[],
+      images: [] as ImageItem[],
       slug: formData.get('slug') as string,
       excerpt: formData.get('excerpt') as string,
       _id: params.project_id as string
@@ -38,7 +38,7 @@ export default function AdminProjectEdit({ params }: { params: { project_id: str
 
     const image = formData.get('image.1') as string;
     if (image) {
-      projectPayload.images = [{ _id: image }] as Image[];
+      projectPayload.images = [{ _id: image }] as ImageItem[];
     }
 
     const { project, error } = await updateProject(projectPayload);

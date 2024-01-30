@@ -1,11 +1,8 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { getWorkExperienceById, updateWorkExperience } from "./../_operations";
-import { ProjectPost } from "@/types/project";
-import { revalidatePath } from "next/cache";
 import { ChangeEvent, useEffect, useState } from "react";
 import { notFound } from 'next/navigation'
-import { Image } from "@/types/media";
 import { WorkExperiencePost } from "@/types/experience";
 import SwitcherOne from "@/components/Switchers/SwitcherOne";
 

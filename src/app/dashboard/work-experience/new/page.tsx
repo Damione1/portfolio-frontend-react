@@ -1,7 +1,6 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { redirect } from 'next/navigation'
-import { Image } from "@/types/media";
 import { createWorkExperience } from "../_operations";
 import { WorkExperiencePost } from "@/types/experience";
 import { ChangeEvent, useState } from "react";

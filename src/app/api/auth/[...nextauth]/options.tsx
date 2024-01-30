@@ -4,6 +4,45 @@ import { NextAuthOptions, Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { signOut } from "next-auth/react";
 
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: number;
+            email: string;
+            name: string;
+        };
+        backendTokens: {
+            accessToken: string;
+            refreshToken: string;
+            expiresAt: number;
+        };
+    }
+
+    interface User {
+        id: number;
+        email: string;
+        name: string;
+        accessToken: string;
+        refreshToken: string;
+        expiresAt: number;
+    }
+}
+declare module "next-auth/jwt" {
+    interface JWT {
+        user: {
+            id: number;
+            email: string;
+            name: string;
+        };
+        backendTokens: {
+            accessToken: string;
+            refreshToken: string;
+            expiresAt: number;
+        };
+    }
+}
+
+
 export const authOptions: NextAuthOptions = {
     providers: [
         {
@@ -15,7 +54,6 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                console.log("Authorizing through the API")
                 const res = await fetch(
                     `${process.env.NEXT_API_URL}/auth/login`,
                     {
@@ -29,6 +67,9 @@ export const authOptions: NextAuthOptions = {
                 const userResponse = await res.json();
                 if (res.ok && userResponse) {
                     return {
+                        id: userResponse.userId,
+                        email: userResponse.email,
+                        name: userResponse.fullName,
                         accessToken: userResponse.token,
                         refreshToken: userResponse.refresh_token,
                         expiresAt: Date.now() + userResponse.expires_in * 1000,
@@ -39,6 +80,7 @@ export const authOptions: NextAuthOptions = {
         },
     ],
     callbacks: {
+        // @ts-ignore
         async jwt({ token, user }) {
             if (user) {
                 token.backendTokens = {
@@ -67,7 +109,11 @@ export const authOptions: NextAuthOptions = {
                 }
             }
 
-            return token;
+            // Ensure that the token object always has a user and backendTokens properties
+            token.user = token.user || {};
+            token.backendTokens = token.backendTokens || {};
+
+            return token as JWT;
         },
         async session({ session, token }) {
             return {
