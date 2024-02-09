@@ -1,16 +1,13 @@
 import React from 'react';
-import { formatDate } from '../../../helpers/date'
-import { Post } from '../../../models/experience'
+import { formatDate } from '../../helpers/date'
+import { WorkExperiencePost } from '../../types/experience'
 
 
 interface Props {
-  post: Post;
+  post: WorkExperiencePost;
 }
 
 const PublicItem: React.FC<Props> = ({ post }) => {
-  post.subTitle = post.company || post.school;
-  post.title = post.position || post.grade;
-
   return (
     <div className="p-4 w-full lg:w-1/3 sm:w-1/2 flex flex-col">
       <div className="flex-grow border-2 rounded-lg border-gray-200 dark:text-gray-300 border-opacity-50 p-8 sm:flex-row flex-col">

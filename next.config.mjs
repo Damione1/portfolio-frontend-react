@@ -6,6 +6,9 @@ const nextConfig = {
                 hostname: "storage.googleapis.com",
             },
             {
+                hostname: "storage.cloud.google.com",
+            },
+            {
                 hostname: "generative-placeholders.glitch.me",
             }
         ],
