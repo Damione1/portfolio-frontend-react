@@ -1,18 +1,14 @@
-import { ImageItem } from './media'
+import { ImageItem } from "./media";
 
-export interface ProjectPost {
-    _id: string
-    title: string
-    content: string
-    images: ImageItem[]
-    tags: string[]
-    stack: string[]
-    user: string
-    language: string
-    slug: string
-    createdAt: string
-    updatedAt: string
-    link: string
-    __v: number
-    excerpt: string
+export interface ProjectItem {
+  id: number;
+  title: string;
+  excerpt: string;
+  content: string;
+  status: string;
+  user_id: string;
+  cover_image: ImageItem;
+  cover_image_id: number;
+  created_at: string;
+  updated_at: string;
 }
