@@ -5,173 +5,115 @@ import { JWT } from "next-auth/jwt";
 import { signOut } from "next-auth/react";
 
 declare module "next-auth" {
-    interface Session {
-        user: {
-            id: number;
-            email: string;
-            name: string;
-        };
-        backendTokens: {
-            accessToken: string;
-            refreshToken: string;
-            expiresAt: number;
-        };
-    }
+  interface Session {
+    user: {
+      id: number;
+      email: string;
+      name: string;
+    };
+    backendTokens: {
+      accessToken: string;
+    };
+  }
 
-    interface User {
-        id: number;
-        email: string;
-        name: string;
-        accessToken: string;
-        refreshToken: string;
-        expiresAt: number;
-    }
+  interface User {
+    id: number;
+    email: string;
+    name: string;
+    accessToken: string;
+  }
 }
 declare module "next-auth/jwt" {
-    interface JWT {
-        user: {
-            id: number;
-            email: string;
-            name: string;
-        };
-        backendTokens: {
-            accessToken: string;
-            refreshToken: string;
-            expiresAt: number;
-        };
-    }
+  interface JWT {
+    user: {
+      id: number;
+      email: string;
+      name: string;
+    };
+    backendTokens: {
+      accessToken: string;
+      refreshToken: string;
+      expiresAt: number;
+    };
+  }
 }
-
 
 export const authOptions: NextAuthOptions = {
-    providers: [
-        {
-            id: "credentials",
-            name: "Credentials",
-            type: "credentials",
-            credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" },
-            },
-            async authorize(credentials) {
-                const res = await fetch(
-                    `${process.env.NEXT_API_URL}/auth/login`,
-                    {
-                        method: "POST",
-                        body: JSON.stringify(credentials),
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                const userResponse = await res.json();
-                if (res.ok && userResponse) {
-                    return {
-                        id: userResponse.userId,
-                        email: userResponse.email,
-                        name: userResponse.fullName,
-                        accessToken: userResponse.token,
-                        refreshToken: userResponse.refresh_token,
-                        expiresAt: Date.now() + userResponse.expires_in * 1000,
-                    };
-                }
-                return null;
-            },
-        },
-    ],
-    callbacks: {
-        // @ts-ignore
-        async jwt({ token, user }) {
-            if (user) {
-                token.backendTokens = {
-                    accessToken: user?.accessToken,
-                    refreshToken: user?.refreshToken,
-                    expiresAt: user?.expiresAt,
-                } as JWT["backendTokens"];
-            }
-
-            // If the access token has expired
-            if (token.backendTokens.expiresAt && (token.backendTokens.expiresAt as number) <= Date.now()) {
-                if (!token.backendTokens.refreshToken) {
-                    // handle error according to your needs
-                    console.log("no refresh token, logging out");
-                    signOut();
-                    return;
-                }
-                // Get a new token
-                const refreshedToken = await refreshAccessToken(token.backendTokens.refreshToken);
-                if (refreshedToken.error) {
-                    // handle error according to your need
-                    console.log("error refreshing token", refreshedToken.error);
-                } else {
-                    token.backendTokens.accessToken = refreshedToken.accessToken as string;
-                    token.backendTokens.expiresAt = refreshedToken.accessTokenExpires as number;
-                }
-            }
-
-            // Ensure that the token object always has a user and backendTokens properties
-            token.user = token.user || {};
-            token.backendTokens = token.backendTokens || {};
-
-            return token as JWT;
-        },
-        async session({ session, token }) {
-            return {
-                ...session,
-                user: {
-                    ...session.user,
-                    role: token.role,
-                    id: token.id,
-                },
-                backendTokens: {
-                    accessToken: token.backendTokens.accessToken,
-                    refreshToken: token.backendTokens.refreshToken,
-                    expiresAt: token.backendTokens.expiresAt,
-                },
-                error: token.error,
-            };
-        },
-        async redirect({ url, baseUrl }) {
-            return url
-        },
-    },
-    session: {
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-        updateAge: 24 * 60 * 60, // 24 hours
-        generateSessionToken: () => {
-            return randomUUID?.() ?? randomBytes(32).toString("hex")
-        }
-    },
-    pages: {
-        signIn: '/auth',
-    }
-};
-
-async function refreshAccessToken(refreshToken: string) {
-    try {
-        console.log("refreshing token from", refreshToken)
-        const res = await fetch(`${process.env.NEXT_API_URL}/auth/refreshToken`, {
-            method: "POST",
-            body: JSON.stringify({ refresh_token: refreshToken }),
-            headers: {
-                "Content-Type": "application/json",
-            },
+  providers: [
+    {
+      id: "credentials",
+      name: "Credentials",
+      type: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const authResponse = await fetch(`${process.env.NEXT_API_URL}/login`, {
+          method: "POST",
+          body: JSON.stringify(credentials),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
-
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+        const authToken = await authResponse.json();
+        if (authResponse.ok && authToken) {
+          const userResponse = await fetch(`${process.env.NEXT_API_URL}/user`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken.access_token}`,
+            },
+          });
+          const user = await userResponse.json();
+          if (userResponse.ok && user) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              accessToken: authToken.access_token,
+            };
+          }
         }
-
-        const response = await res.json();
-
-        return {
-            accessToken: response.token as string,
-            accessTokenExpires: (Date.now() + response.expires_in * 1000) as number,
-        }
-    } catch (error) {
-        console.log("error refreshing token", error)
-        return {
-            error: "RefreshAccessTokenError",
-        }
-    }
-}
+        return null;
+      },
+    },
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.backendTokens = {
+          accessToken: user.accessToken,
+        } as JWT["backendTokens"];
+      }
+      // Ensure that the token object always has a user and backendTokens properties
+      token.user = token.user || {};
+      token.backendTokens = token.backendTokens || {};
+      return token as JWT;
+    },
+    async session({ session, token }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+        },
+        backendTokens: {
+          accessToken: token.backendTokens.accessToken,
+        },
+      };
+    },
+    async redirect({ url, baseUrl }) {
+      return url;
+    },
+  },
+  session: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
+    generateSessionToken: () => {
+      return randomUUID?.() ?? randomBytes(32).toString("hex");
+    },
+  },
+  pages: {
+    signIn: "/auth",
+  },
+};

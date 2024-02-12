@@ -1,49 +1,31 @@
-"use client";
+"use server";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 import { deleteProject, listProjects } from "./_operations";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
-import { useEffect, useState } from "react";
-import { PostListItem } from "@/components/Tables/TableThree";
-import { ProjectPost } from "@/types/project";
 import { formatDate } from "@/helpers/date";
 
+export default async function AdminProjectsListing() {
+  let { projects, error } = await listProjects();
 
+  console.log("projects", projects);
 
-export default function AdminProjectsListing() {
-  const [projects, setProjects] = useState<PostListItem[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const { posts, error } = await listProjects();
-      if (error) {
-        window.alert(`Api error: ${error}`);
-        setError(error);
-      } else {
-        setProjects(posts);
-      }
-    })();
-  }, []);
-
-
-  const deleteThisProject = async (id: string) => {
+  async function deleteThisProject(id: number) {
     const { error } = await deleteProject(id);
     if (error) {
       console.error("project not found", error);
       return;
     }
-    //pop the project from the list
-    const newProjects = projects.filter((project) => project._id !== id);
-    setProjects(newProjects);
+    projects = projects.filter((project) => project.id !== Number(id));
   }
 
   return (
     <div key="admin-projects-listing">
       <Breadcrumb pageName="Projects" />
       <div className="flex flex-col gap-10">
-        {error ? <div>Error loading posts: {error}</div> :
+        {error ? (
+          <div>Error loading posts: {error}</div>
+        ) : (
           <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <div className="max-w-full overflow-x-auto">
               <table className="w-full table-auto">
@@ -73,17 +55,24 @@ export default function AdminProjectsListing() {
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                          {post.createdAt !== "" ? formatDate(post.createdAt.toString()) : 'N/A'}
+                          {post.created_at !== ""
+                            ? formatDate(post.created_at.toString())
+                            : "N/A"}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                          {post.updatedAt !== "" ? formatDate(post.updatedAt.toString()) : 'N/A'}
+                          {post.updated_at !== ""
+                            ? formatDate(post.updated_at.toString())
+                            : "N/A"}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <div className="flex items-center space-x-3.5">
-                          <Link className="hover:text-primary" href={`/dashboard/project/${post._id}`}>
+                          <Link
+                            className="hover:text-primary"
+                            href={`/dashboard/project/${post.id}`}
+                          >
                             <svg
                               className="fill-current"
                               width="18"
@@ -102,7 +91,11 @@ export default function AdminProjectsListing() {
                               />
                             </svg>
                           </Link>
-                          <button className="hover:text-primary" onClick={async () => { await deleteThisProject(post._id) }}  >
+
+                          <button
+                            className="hover:text-primary"
+                            onClick={() => deleteProject(post.id)}
+                          >
                             <svg
                               className="fill-current"
                               width="18"
@@ -133,7 +126,8 @@ export default function AdminProjectsListing() {
                       </td>
                     </tr>
                   ))}
-                  {projects.length === 0 &&
+
+                  {projects.length === 0 && (
                     <tr>
                       <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                         <h5 className="font-medium text-black dark:text-white">
@@ -141,16 +135,19 @@ export default function AdminProjectsListing() {
                         </h5>
                       </td>
                     </tr>
-                  }
+                  )}
                 </tbody>
               </table>
             </div>
-          </div >
-        }
+          </div>
+        )}
       </div>
-      <Link href="/dashboard/project/new" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+      <Link
+        href="/dashboard/project/new"
+        className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray mt-4"
+      >
         Create a new project
       </Link>
     </div>
   );
-};
+}
