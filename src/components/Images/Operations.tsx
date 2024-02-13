@@ -2,14 +2,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { ImageItem } from "@/types/media";
 import { getServerSession } from "next-auth";
 
-export async function uploadImage(imageBlob: Blob) {
+export async function uploadImage(formData: FormData) {
   const session = await getServerSession(authOptions);
-  const data = new FormData();
-  data.append("image", imageBlob);
   try {
     const response = await fetch(`${process.env.NEXT_API_URL}/images`, {
       method: "POST",
-      body: data,
+      body: formData,
       headers: {
         Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
         "Content-Type": "application/json",
