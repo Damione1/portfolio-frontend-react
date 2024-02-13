@@ -1,33 +1,29 @@
-"use client";
-import { Resolver, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-
-import Link from "next/link";
-import { ProjectItem } from "@/types/project";
-import { createProject, updateProject } from "./_operations";
-import { useRouter } from "next/navigation";
-import { preload } from "react-dom";
-import ImageUploadForm from "@/components/Images/ImageUploadForm";
-import { ImageItem } from "@/types/media";
-import { useEffect, useState } from "react";
-
-interface FormValues {
-  title: string;
-  excerpt: string;
-  content: string;
+// Create new server action for project creation
+// pages/api/actions/create-project.js
+export async function doPost(data) {
+  const createdProject = await createProject(data);
+  return { data: createdProject };
 }
+
+// Create new server action for project update
+// pages/api/actions/update-project.js
+export async function doPost({ id, data }) {
+  const updatedProject = await updateProject(id, data);
+  return { data: updatedProject };
+}
+
+// main component
+// pages/AddEditForm.server.js
+import { useServerAction, useServerResponse } from "next/server";
+import { ProjectItem } from "@/types/project";
+import { ImageItem } from "@/types/media";
+import ImageUploadForm from "@/components/Images/ImageUploadForm";
+import { useForm } from "@serviform/react";
 
 export function AddEdit({ project }: { project: ProjectItem | null }) {
   const isAddMode = !project;
-  const router = useRouter();
-  const [image, setImage] = useState<ImageItem | null>(null);
 
-  useEffect(() => {
-    if (project && project.cover_image) {
-      setImage(project.cover_image);
-    }
-  }, [project, setImage]);
+  const [image, setImage] = useState<ImageItem | null>(null);
 
   const defaultValues = isAddMode
     ? undefined
@@ -37,19 +33,20 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
         content: project.content,
       };
 
-  const validationSchema = Yup.object().shape({
-    title: Yup.string().required("Title is required").max(255),
-    excerpt: Yup.string().required("Excerpt is required").max(500),
-    content: Yup.string().required("Content is required"),
-  });
-
   const { register, handleSubmit, formState, reset } = useForm<FormValues>({
     defaultValues,
-    resolver: yupResolver(validationSchema),
   });
-  const { errors } = formState;
 
-  async function onSubmit(data: any) {
+  const createProjectAction = useServerAction(
+    "/api/actions/create-project",
+    "json"
+  );
+  const updateProjectAction = useServerAction(
+    "/api/actions/update-project",
+    "json"
+  );
+
+  const onSubmit = async (data) => {
     const projectPayload = {
       title: data.title as string,
       excerpt: data.excerpt as string,
@@ -61,21 +58,19 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
     }
 
     if (isAddMode) {
-      const { project: createdProject, error } = await createProject(
-        projectPayload
-      );
-      if (error) {
-        return error;
-      }
-      router.prefetch(`/dashboard/project/${createdProject.id}`);
-      router.push(`/dashboard/project/${createdProject.id}`);
+      await createProjectAction.submit(projectPayload);
     } else {
-      const { error } = await updateProject(project.id, projectPayload);
-      if (error) {
-        return error;
-      }
+      await updateProjectAction.submit({
+        id: project.id,
+        data: projectPayload,
+      });
     }
-  }
+  };
+
+  const createResponse = useServerResponse(createProjectAction);
+  const updateResponse = useServerResponse(updateProjectAction);
+
+  // handle your createdResponse or updatedResponse based on form submission
 
   return (
     <div className="grid grid-cols-5 gap-8">

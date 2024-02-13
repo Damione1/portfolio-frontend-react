@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { getProjectById } from "./../_operations";
+import { ProjectService } from "./../_operations";
 import { notFound } from "next/navigation";
 import { AddEdit } from "../AddEditForm";
 
@@ -11,7 +11,10 @@ export default async function AdminProjectEdit({
   if (params === undefined || params.project_id === undefined) {
     notFound();
   }
-  const { project, error } = await getProjectById(params.project_id);
+  const projectService = new ProjectService();
+  const { project, error } = await projectService.GetProjectById(
+    params.project_id
+  );
   if (error || !project) {
     notFound();
   }

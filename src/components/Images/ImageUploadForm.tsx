@@ -6,73 +6,34 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { uploadImage } from "./Operations";
 
+async function upload(formData: FormData) {
+  "use server";
+  const image = formData.get("image");
+  if (!image) {
+    return;
+  }
+
+  const { image: imageResponse, error } = await uploadImage(formData);
+  if (error) {
+    console.log("error", error);
+    return;
+  }
+}
+
 interface ImageUploadFormProps {
-  setImage: (image: ImageItem | null) => void;
   defaultImage: ImageItem | null;
   title?: string;
   subtitle?: string;
 }
 
-// export async function uploadImage(imageBlob: Blob) {
-//   const session = await getServerSession(authOptions);
-//   const data = new FormData();
-//   data.append("image", imageBlob);
-//   try {
-//     const response = await fetch(`${process.env.NEXT_API_URL}/images`, {
-//       method: "POST",
-//       body: data,
-//       headers: {
-//         Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     if (!response.ok) {
-//       throw new Error(response.statusText);
-//     }
-
-//     const imageData = await response.json();
-//     const image = Object.assign({}, imageData.data) as ImageItem;
-//     return { image, error: null };
-//   } catch (error: any) {
-//     console.log("error", error);
-//     return {
-//       image: {} as ImageItem,
-//       error: error.message,
-//     };
-//   }
-// }
-
-export default function ImageUploadForm({
-  setImage,
+export default async function ImageUploadForm({
   defaultImage,
   title,
   subtitle,
 }: ImageUploadFormProps) {
-  const [localImage, setLocalImage] = useState(defaultImage);
   const { register, handleSubmit, setValue } = useForm();
 
-  useEffect(() => {
-    setImage(localImage);
-  }, [localImage, setImage]);
-
-  const handleDelete = () => {
-    setLocalImage(null);
-  };
-
-  const onSubmit = async (data: any) => {
-    console.log("data", data);
-    const imagePayload = data.image[0] as Blob;
-    if (!imagePayload) {
-      return alert("Please select an image to upload");
-    }
-    const { image: imageResponse, error } = await uploadImage(imagePayload);
-    if (error) {
-      console.log("error", error);
-      return;
-    }
-    setLocalImage(imageResponse);
-  };
+  let localImage = defaultImage;
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -81,7 +42,7 @@ export default function ImageUploadForm({
           {title ?? "Your photo"}
         </h3>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form action={upload}>
         {localImage && (
           <div className="mb-4 flex items-center gap-3">
             <div className="h-14 w-14 rounded-full">
@@ -97,7 +58,7 @@ export default function ImageUploadForm({
               </span>
               <span className="flex gap-2.5">
                 <button
-                  onClick={handleDelete}
+                  //onClick={handleDelete}
                   className="text-sm hover:text-primary"
                 >
                   Delete
@@ -115,7 +76,6 @@ export default function ImageUploadForm({
               type="file"
               accept="image/*"
               {...register("image")}
-              onChange={handleSubmit(onSubmit)}
               className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
             />
             <div className="flex flex-col items-center justify-center space-y-3">
@@ -154,6 +114,9 @@ export default function ImageUploadForm({
               <p className="mt-1.5">SVG, PNG, JPG or GIF</p>
               <p>(max, 800 X 800px)</p>
             </div>
+            <button className="btn-primary" type="submit">
+              Upload
+            </button>
           </div>
         )}
       </form>
