@@ -1,6 +1,11 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { ProjectItem } from "@/types/project";
-import { AddEdit } from "../AddEditForm";
+import { AddEdit } from "../addEditForm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Edit Project",
+  description: "Edit a project",
+};
 
 export default function AdminProjectCreate() {
   return (

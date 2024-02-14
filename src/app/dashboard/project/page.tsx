@@ -1,8 +1,14 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
-import { ProjectService } from "./_operations";
+import { ProjectService } from "./client";
 import Link from "next/link";
 import { formatDate } from "@/helpers/date";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "Add or edit a project",
+};
 
 async function deleteThisProject(formData: FormData) {
   "use server";
