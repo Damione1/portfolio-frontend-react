@@ -1,30 +1,14 @@
-// Create new server action for project creation
-// pages/api/actions/create-project.js
-export async function doPost(data) {
-  const createdProject = await createProject(data);
-  return { data: createdProject };
-}
-
-// Create new server action for project update
-// pages/api/actions/update-project.js
-export async function doPost({ id, data }) {
-  const updatedProject = await updateProject(id, data);
-  return { data: updatedProject };
-}
-
-// main component
-// pages/AddEditForm.server.js
-import { useServerAction, useServerResponse } from "next/server";
+"use client";
 import { ProjectItem } from "@/types/project";
-import { ImageItem } from "@/types/media";
 import ImageUploadForm from "@/components/Images/ImageUploadForm";
-import { useForm } from "@serviform/react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ProjectService } from "./client";
+import { ProjectInput, projectSchema } from "./validations";
+import Link from "next/link";
 
 export function AddEdit({ project }: { project: ProjectItem | null }) {
   const isAddMode = !project;
-
-  const [image, setImage] = useState<ImageItem | null>(null);
-
   const defaultValues = isAddMode
     ? undefined
     : {
@@ -32,45 +16,37 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
         excerpt: project.excerpt,
         content: project.content,
       };
-
-  const { register, handleSubmit, formState, reset } = useForm<FormValues>({
+  const form = useForm<ProjectInput>({
+    resolver: zodResolver(projectSchema),
     defaultValues,
   });
+  const projectService = new ProjectService();
 
-  const createProjectAction = useServerAction(
-    "/api/actions/create-project",
-    "json"
-  );
-  const updateProjectAction = useServerAction(
-    "/api/actions/update-project",
-    "json"
-  );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+    reset,
+    watch,
+    trigger,
+    control,
+    setValue,
+    setFocus,
+  } = form;
 
-  const onSubmit = async (data) => {
+  async function onSubmit(values: ProjectInput) {
     const projectPayload = {
-      title: data.title as string,
-      excerpt: data.excerpt as string,
-      content: data.content as string,
+      title: values.title,
+      excerpt: values.excerpt,
+      content: values.content,
     } as ProjectItem;
 
-    if (image) {
-      projectPayload.cover_image_id = image.id;
-    }
-
     if (isAddMode) {
-      await createProjectAction.submit(projectPayload);
+      await projectService.createProject(projectPayload);
     } else {
-      await updateProjectAction.submit({
-        id: project.id,
-        data: projectPayload,
-      });
+      await projectService.updateProject(project.id, projectPayload);
     }
-  };
-
-  const createResponse = useServerResponse(createProjectAction);
-  const updateResponse = useServerResponse(updateProjectAction);
-
-  // handle your createdResponse or updatedResponse based on form submission
+  }
 
   return (
     <div className="grid grid-cols-5 gap-8">
@@ -85,7 +61,7 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
                 <input
                   type="text"
                   {...register("title")}
-                  disabled={formState.isSubmitting}
+                  disabled={isSubmitting}
                   className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary  dark:disabled:bg-black ${
                     errors.title ? "is-invalid" : ""
                   }`}
@@ -100,7 +76,7 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
                 <input
                   type="text"
                   {...register("excerpt")}
-                  disabled={formState.isSubmitting}
+                  disabled={isSubmitting}
                   className={`w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary dark:disabled:bg-black ${
                     errors.title ? "is-invalid" : ""
                   }`}
@@ -116,7 +92,7 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
                 </label>
                 <textarea
                   rows={12}
-                  disabled={formState.isSubmitting}
+                  disabled={isSubmitting}
                   {...register("content")}
                   className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary dark:disabled:bg-black"
                 ></textarea>
@@ -129,10 +105,10 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
           <div className="grid grid-cols-3 gap-3 mt-4">
             <button
               type="submit"
-              disabled={formState.isSubmitting}
+              disabled={isSubmitting}
               className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
-              {formState.isSubmitting && (
+              {isSubmitting && (
                 <span className="animate-spin mr-4">
                   <svg
                     width="24"
@@ -158,7 +134,7 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
             <button
               onClick={() => reset(defaultValues)}
               type="button"
-              disabled={formState.isSubmitting}
+              disabled={isSubmitting}
               className="inline-flex items-center justify-center rounded-md border border-primary px-10 py-4 text-center font-medium text-primary hover:bg-opacity-90 lg:px-8 xl:px-10"
             >
               Reset
@@ -173,12 +149,12 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
         </form>
       </div>
       <div className="col-span-5 xl:col-span-2">
-        <ImageUploadForm
+        {/* <ImageUploadForm
           setImage={setImage}
           defaultImage={project?.cover_image ?? null}
           title="Project Cover Image"
           subtitle="Upload a cover image for your project"
-        ></ImageUploadForm>
+        ></ImageUploadForm> */}
       </div>
     </div>
   );

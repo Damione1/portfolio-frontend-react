@@ -1,7 +1,13 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { ProjectService } from "./../_operations";
+import { ProjectService } from "../client";
 import { notFound } from "next/navigation";
-import { AddEdit } from "../AddEditForm";
+import { AddEdit } from "../addEditForm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Edit Project",
+  description: "Edit a project",
+};
 
 export default async function AdminProjectEdit({
   params,
