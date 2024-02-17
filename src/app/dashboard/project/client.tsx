@@ -1,146 +1,149 @@
+"use server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { ProjectItem } from "@/types/project";
 import { getServerSession } from "next-auth";
 
-export class ProjectService {
-  private session: ReturnType<typeof getServerSession>;
-  private apiUrl: string;
+export async function listProjects() {
+  try {
+    const session = await getServerSession(authOptions);
+    const apiUrl = process.env.NEXT_API_URL || "";
 
-  constructor() {
-    this.apiUrl = process.env.NEXT_API_URL || "";
-    this.session = getServerSession(authOptions);
-  }
+    const response = await fetch(`${apiUrl}/projects`, {
+      next: {
+        revalidate: 0,
+      },
+      headers: {
+        Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+      },
+    });
 
-  async listProjects() {
-    try {
-      const session = (await this.session) as any;
-      const response = await fetch(`${this.apiUrl}/projects`, {
-        next: {
-          revalidate: 0,
-        },
-        headers: {
-          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      const projectsResponse = await response.json();
-      const projects = projectsResponse.data.map((project: ProjectItem) => {
-        return Object.assign({}, project) as ProjectItem;
-      }) as ProjectItem[];
-
-      return { projects, error: null };
-    } catch (error: any) {
-      return {
-        projects: [] as ProjectItem[],
-        error: error.message,
-      };
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const projectsResponse = await response.json();
+    const projects = projectsResponse.data.map((project: ProjectItem) => {
+      return Object.assign({}, project) as ProjectItem;
+    }) as ProjectItem[];
+
+    return { projects, error: null };
+  } catch (error: any) {
+    return {
+      projects: [] as ProjectItem[],
+      error: error.message,
+    };
   }
-  async GetProjectById(projectId: String) {
-    try {
-      const session = (await this.session) as any;
-      const response = await fetch(`${this.apiUrl}/projects/${projectId}`, {
-        next: {
-          revalidate: 0,
-        },
-        headers: {
-          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-        },
-      });
+}
+export async function GetProjectById(projectId: String) {
+  try {
+    const session = await getServerSession(authOptions);
+    const apiUrl = process.env.NEXT_API_URL || "";
+    const response = await fetch(`${apiUrl}/projects/${projectId}`, {
+      next: {
+        revalidate: 0,
+      },
+      headers: {
+        Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+        Accept: "application/json",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      const projectData = await response.json();
-      const project = Object.assign({}, projectData.data) as ProjectItem;
-      return { project, error: null };
-    } catch (error: any) {
-      return {
-        project: {} as ProjectItem,
-        error: error.message,
-      };
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const projectData = await response.json();
+    const project = Object.assign({}, projectData.data) as ProjectItem;
+    return { project, error: null };
+  } catch (error: any) {
+    return {
+      project: {} as ProjectItem,
+      error: error.message,
+    };
   }
-  async createProject(payload: ProjectItem) {
-    try {
-      const session = (await this.session) as any;
-      const response = await fetch(`${this.apiUrl}/projects`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: {
-          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+}
+export async function createProject(payload: ProjectItem) {
+  try {
+    const session = await getServerSession(authOptions);
+    const apiUrl = process.env.NEXT_API_URL || "";
+    const response = await fetch(`${apiUrl}/projects`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      const projectData = await response.json();
-      const project = Object.assign({}, projectData) as ProjectItem;
-      return { project, error: null };
-    } catch (error: any) {
-      console.log("error", error);
-      return {
-        project: {} as ProjectItem,
-        error: error.message,
-      };
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const projectData = await response.json();
+    const project = Object.assign({}, projectData) as ProjectItem;
+    return { project, error: null };
+  } catch (error: any) {
+    console.log("error", error);
+    return {
+      project: {} as ProjectItem,
+      error: error.message,
+    };
   }
-  async updateProject(projectId: number, payload: ProjectItem) {
-    try {
-      const session = (await this.session) as any;
-      const response = await fetch(`${this.apiUrl}/projects`, {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-        headers: {
-          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+}
+export async function updateProject(projectId: number, payload: ProjectItem) {
+  console.log("payload srv", payload);
+  try {
+    const session = await getServerSession(authOptions);
+    const apiUrl = process.env.NEXT_API_URL || "";
+    const response = await fetch(`${apiUrl}/projects/${projectId}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      const projectData = await response.json();
-      const project = Object.assign({}, projectData) as ProjectItem;
-      return { project, error: null };
-    } catch (error: any) {
-      return {
-        project: {} as ProjectItem,
-        error: error.message,
-      };
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const projectData = await response.json();
+    const project = Object.assign({}, projectData) as ProjectItem;
+    return { project, error: null };
+  } catch (error: any) {
+    return {
+      project: {} as ProjectItem,
+      error: error.message,
+    };
   }
-  async deleteProject(projectId: number) {
-    try {
-      const session = (await this.session) as any;
-      const response = await fetch(`${this.apiUrl}/projects`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
+}
 
-      const projectData = await response.json();
-      const project = Object.assign({}, projectData) as ProjectItem;
-      return { project, error: null };
-    } catch (error: any) {
-      return {
-        project: {} as ProjectItem,
-        error: error.message,
-      };
+export async function deleteProject(projectId: number) {
+  try {
+    const session = await getServerSession(authOptions);
+    const apiUrl = process.env.NEXT_API_URL || "";
+    const response = await fetch(`${apiUrl}/projects/${projectId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(response.statusText);
     }
+
+    const projectData = await response.json();
+    const project = Object.assign({}, projectData) as ProjectItem;
+    return { project, error: null };
+  } catch (error: any) {
+    return {
+      project: {} as ProjectItem,
+      error: error.message,
+    };
   }
 }
