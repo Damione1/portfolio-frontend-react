@@ -1,39 +1,57 @@
+"use client";
 import { ImageItem } from "@/types/media";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { uploadImage } from "./Operations";
-
-async function upload(formData: FormData) {
-  "use server";
-  const image = formData.get("image");
-  if (!image) {
-    return;
-  }
-
-  const { image: imageResponse, error } = await uploadImage(formData);
-  if (error) {
-    console.log("error", error);
-    return;
-  }
-}
+import { UploadImageInput } from "@/app/dashboard/project/validations";
 
 interface ImageUploadFormProps {
   defaultImage: ImageItem | null;
   title?: string;
   subtitle?: string;
+  setImageId: (imageId: number | undefined) => void;
 }
 
-export default async function ImageUploadForm({
+export default function ImageUploadForm({
   defaultImage,
   title,
   subtitle,
+  setImageId,
 }: ImageUploadFormProps) {
-  const { register, handleSubmit, setValue } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+    reset,
+    watch,
+    trigger,
+    control,
+    setValue,
+    setFocus,
+  } = useForm();
 
   let localImage = defaultImage;
+
+  async function onSubmit(fields: UploadImageInput) {
+    if (!fields.image) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append("image", fields.image);
+    const { image: imageResponse, error } = await uploadImage(formData);
+    if (error) {
+      alert("Error uploading image " + error);
+      return;
+    }
+    setImageId(imageResponse.id);
+    localImage = imageResponse;
+  }
+
+  const handleDelete = () => {
+    console.log("handleDelete upload");
+    setImageId(undefined);
+    localImage = null;
+  };
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -42,15 +60,19 @@ export default async function ImageUploadForm({
           {title ?? "Your photo"}
         </h3>
       </div>
-      <form action={upload}>
+      <form>
         {localImage && (
           <div className="mb-4 flex items-center gap-3">
             <div className="h-14 w-14 rounded-full">
-              <Image
-                src={localImage?.path ?? "/images/placeholder.jpg"}
-                layout="fill"
-                alt="Uploaded image"
-              />
+              <div
+                style={{ width: "56px", height: "56px", position: "relative" }}
+              >
+                <Image
+                  src={localImage?.path ?? "/images/placeholder.jpg"}
+                  alt="Uploaded image"
+                  layout="fill"
+                />
+              </div>
             </div>
             <div>
               <span className="mb-1.5 text-black dark:text-white">
@@ -58,7 +80,7 @@ export default async function ImageUploadForm({
               </span>
               <span className="flex gap-2.5">
                 <button
-                  //onClick={handleDelete}
+                  onClick={handleDelete}
                   className="text-sm hover:text-primary"
                 >
                   Delete
@@ -76,6 +98,13 @@ export default async function ImageUploadForm({
               type="file"
               accept="image/*"
               {...register("image")}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  setValue("image", file);
+                  handleSubmit(onSubmit)();
+                }
+              }}
               className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
             />
             <div className="flex flex-col items-center justify-center space-y-3">

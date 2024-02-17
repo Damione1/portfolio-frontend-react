@@ -1,8 +1,8 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { ProjectService } from "../client";
 import { notFound } from "next/navigation";
 import { AddEdit } from "../addEditForm";
 import { Metadata } from "next";
+import { GetProjectById } from "../client";
 
 export const metadata: Metadata = {
   title: "Edit Project",
@@ -17,10 +17,7 @@ export default async function AdminProjectEdit({
   if (params === undefined || params.project_id === undefined) {
     notFound();
   }
-  const projectService = new ProjectService();
-  const { project, error } = await projectService.GetProjectById(
-    params.project_id
-  );
+  const { project, error } = await GetProjectById(params.project_id);
   if (error || !project) {
     notFound();
   }

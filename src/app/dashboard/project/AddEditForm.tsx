@@ -3,11 +3,12 @@ import { ProjectItem } from "@/types/project";
 import ImageUploadForm from "@/components/Images/ImageUploadForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ProjectService } from "./client";
 import { ProjectInput, projectSchema } from "./validations";
 import Link from "next/link";
+import { createProject, updateProject } from "./client";
+import { redirect } from "next/navigation";
 
-export function AddEdit({ project }: { project: ProjectItem | null }) {
+export async function AddEdit({ project }: { project: ProjectItem | null }) {
   const isAddMode = !project;
   const defaultValues = isAddMode
     ? undefined
@@ -15,12 +16,17 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
         title: project.title,
         excerpt: project.excerpt,
         content: project.content,
+        cover_image_id: project.cover_image_id,
       };
   const form = useForm<ProjectInput>({
     resolver: zodResolver(projectSchema),
     defaultValues,
   });
-  const projectService = new ProjectService();
+
+  const setImageId = (imageId: number | undefined) => {
+    console.log("setImageId", imageId);
+    setValue("cover_image_id", imageId);
+  };
 
   const {
     register,
@@ -39,12 +45,19 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
       title: values.title,
       excerpt: values.excerpt,
       content: values.content,
+      cover_image_id: values.cover_image_id,
     } as ProjectItem;
 
     if (isAddMode) {
-      await projectService.createProject(projectPayload);
+      await createProject(projectPayload).then((res) => {
+        if (res.error) {
+          console.error("Error creating project", res.error);
+          return;
+        }
+        //return redirect(`/dashboard/project/${res.project.id}`);
+      });
     } else {
-      await projectService.updateProject(project.id, projectPayload);
+      await updateProject(project.id, projectPayload);
     }
   }
 
@@ -102,6 +115,7 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
               </div>
             </div>
           </div>
+          <input type="text" {...register("cover_image_id")} />
           <div className="grid grid-cols-3 gap-3 mt-4">
             <button
               type="submit"
@@ -149,12 +163,12 @@ export function AddEdit({ project }: { project: ProjectItem | null }) {
         </form>
       </div>
       <div className="col-span-5 xl:col-span-2">
-        {/* <ImageUploadForm
-          setImage={setImage}
+        <ImageUploadForm
           defaultImage={project?.cover_image ?? null}
+          setImageId={setImageId}
           title="Project Cover Image"
           subtitle="Upload a cover image for your project"
-        ></ImageUploadForm> */}
+        ></ImageUploadForm>
       </div>
     </div>
   );

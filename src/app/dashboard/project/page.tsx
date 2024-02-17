@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
-import { ProjectService } from "./client";
+import { deleteProject, listProjects } from "./client";
 import Link from "next/link";
 import { formatDate } from "@/helpers/date";
 import { Metadata } from "next";
@@ -16,8 +16,8 @@ async function deleteThisProject(formData: FormData) {
   if (!id) {
     return;
   }
-  const projectService = new ProjectService();
-  const { error } = await projectService.deleteProject(Number(id));
+
+  const { error } = await deleteProject(Number(id));
   if (error) {
     console.error("project not found", error);
     return;
@@ -26,8 +26,7 @@ async function deleteThisProject(formData: FormData) {
 }
 
 export default async function AdminProjectsListing() {
-  const projectService = new ProjectService();
-  let { projects, error } = await projectService.listProjects();
+  let { projects, error } = await listProjects();
 
   return (
     <div key="admin-projects-listing">
