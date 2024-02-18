@@ -1,13 +1,11 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
-import { deleteWorkExperience, listWorkExperiences } from "./_operations";
+import { deleteWorkExperience, listWorkExperiences } from "./client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PostListItem } from "@/components/Tables/TableThree";
 import { formatDate } from "@/helpers/date";
-
-
 
 export default function AdminWorkExperiencesListing() {
   const [WorkExperiences, setWorkExperiences] = useState<PostListItem[]>([]);
@@ -25,7 +23,6 @@ export default function AdminWorkExperiencesListing() {
     })();
   }, []);
 
-
   const deleteThisWorkExperience = async (id: string) => {
     const { error } = await deleteWorkExperience(id);
     if (error) {
@@ -33,15 +30,19 @@ export default function AdminWorkExperiencesListing() {
       return;
     }
     //pop the WorkExperience from the list
-    const newWorkExperiences = WorkExperiences.filter((WorkExperience) => WorkExperience._id !== id);
+    const newWorkExperiences = WorkExperiences.filter(
+      (WorkExperience) => WorkExperience._id !== id
+    );
     setWorkExperiences(newWorkExperiences);
-  }
+  };
 
   return (
     <div key="admin-WorkExperiences-listing">
       <Breadcrumb pageName="WorkExperiences" />
       <div className="flex flex-col gap-10">
-        {error ? <div>Error loading posts: {error}</div> :
+        {error ? (
+          <div>Error loading posts: {error}</div>
+        ) : (
           <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <div className="max-w-full overflow-x-auto">
               <table className="w-full table-auto">
@@ -71,17 +72,24 @@ export default function AdminWorkExperiencesListing() {
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                          {post.createdAt !== "" ? formatDate(post.createdAt.toString()) : 'N/A'}
+                          {post.createdAt !== ""
+                            ? formatDate(post.createdAt.toString())
+                            : "N/A"}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <p className="text-black dark:text-white">
-                          {post.updatedAt !== "" ? formatDate(post.updatedAt.toString()) : 'N/A'}
+                          {post.updatedAt !== ""
+                            ? formatDate(post.updatedAt.toString())
+                            : "N/A"}
                         </p>
                       </td>
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <div className="flex items-center space-x-3.5">
-                          <Link className="hover:text-primary" href={`/dashboard/work-experience/${post._id}`}>
+                          <Link
+                            className="hover:text-primary"
+                            href={`/dashboard/work-experience/${post._id}`}
+                          >
                             <svg
                               className="fill-current"
                               width="18"
@@ -100,7 +108,12 @@ export default function AdminWorkExperiencesListing() {
                               />
                             </svg>
                           </Link>
-                          <button className="hover:text-primary" onClick={async () => { await deleteThisWorkExperience(post._id) }}  >
+                          <button
+                            className="hover:text-primary"
+                            onClick={async () => {
+                              await deleteThisWorkExperience(post._id);
+                            }}
+                          >
                             <svg
                               className="fill-current"
                               width="18"
@@ -131,7 +144,7 @@ export default function AdminWorkExperiencesListing() {
                       </td>
                     </tr>
                   ))}
-                  {WorkExperiences.length === 0 &&
+                  {WorkExperiences.length === 0 && (
                     <tr>
                       <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
                         <h5 className="font-medium text-black dark:text-white">
@@ -139,16 +152,19 @@ export default function AdminWorkExperiencesListing() {
                         </h5>
                       </td>
                     </tr>
-                  }
+                  )}
                 </tbody>
               </table>
             </div>
-          </div >
-        }
+          </div>
+        )}
       </div>
-      <Link href="/dashboard/work-experience/new" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+      <Link
+        href="/dashboard/work-experience/new"
+        className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray"
+      >
         Create a new WorkExperience
       </Link>
     </div>
   );
-};
+}

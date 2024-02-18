@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { notFound } from "next/navigation";
-import { AddEdit } from "../addEditForm";
+import { AddEdit } from "../add-edit-form";
 import { Metadata } from "next";
 import { GetProjectById } from "../client";
 

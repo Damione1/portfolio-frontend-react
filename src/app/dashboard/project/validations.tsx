@@ -15,8 +15,8 @@ export const projectSchema = z.object({
   title: z.string().min(1).max(255),
   excerpt: z.string().min(1).max(500),
   content: z.string().min(1),
-  cover_image_id: z.number().optional(),
-  //status: z.enum(["draft", "published", "archived"]),
+  cover_image_id: z.number(),
+  status: z.enum(["draft", "published", "archived"]),
 });
 
 export const uploadImageSchema = z.object({
