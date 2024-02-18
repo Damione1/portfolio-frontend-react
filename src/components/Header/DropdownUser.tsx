@@ -1,7 +1,7 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { signOut } from "next-auth/react";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -81,8 +81,9 @@ const DropdownUser = () => {
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen === true ? "block" : "hidden"
-          }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${
+          dropdownOpen === true ? "block" : "hidden"
+        }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
           <li>
@@ -136,7 +137,10 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <Link className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" href="/api/auth/signout">
+        <Link
+          className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+          href="/api/auth/signout"
+        >
           <svg
             className="fill-current"
             width="22"
@@ -155,10 +159,10 @@ const DropdownUser = () => {
             />
           </svg>
           Log Out
-        </Link >
+        </Link>
       </div>
       {/* <!-- Dropdown End --> */}
-    </div >
+    </div>
   );
 };
 

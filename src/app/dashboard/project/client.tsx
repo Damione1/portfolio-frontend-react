@@ -8,7 +8,7 @@ export async function listProjects() {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
 
-    const response = await fetch(`${apiUrl}/projects`, {
+    const response = await fetch(`${apiUrl}/projects?sort=-created_at`, {
       next: {
         revalidate: 0,
       },
@@ -81,7 +81,7 @@ export async function createProject(payload: ProjectItem) {
     }
 
     const projectData = await response.json();
-    const project = Object.assign({}, projectData) as ProjectItem;
+    const project = Object.assign({}, projectData.data) as ProjectItem;
     return { project, error: null };
   } catch (error: any) {
     console.log("error", error);
@@ -92,7 +92,6 @@ export async function createProject(payload: ProjectItem) {
   }
 }
 export async function updateProject(projectId: number, payload: ProjectItem) {
-  console.log("payload srv", payload);
   try {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
@@ -111,7 +110,7 @@ export async function updateProject(projectId: number, payload: ProjectItem) {
     }
 
     const projectData = await response.json();
-    const project = Object.assign({}, projectData) as ProjectItem;
+    const project = Object.assign({}, projectData.data) as ProjectItem;
     return { project, error: null };
   } catch (error: any) {
     return {
@@ -136,13 +135,9 @@ export async function deleteProject(projectId: number) {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-
-    const projectData = await response.json();
-    const project = Object.assign({}, projectData) as ProjectItem;
-    return { project, error: null };
+    return { error: null };
   } catch (error: any) {
     return {
-      project: {} as ProjectItem,
       error: error.message,
     };
   }

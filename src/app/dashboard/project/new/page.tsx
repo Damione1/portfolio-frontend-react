@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { AddEdit } from "../addEditForm";
+import { AddEdit } from "../add-edit-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
