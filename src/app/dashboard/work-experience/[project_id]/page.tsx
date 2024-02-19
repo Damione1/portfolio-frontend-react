@@ -1,6 +1,9 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { getWorkExperienceById, updateWorkExperience } from "../client";
+import {
+  getWorkExperienceById,
+  updateWorkExperience,
+} from "../../../../clients/work-experience";
 import { ChangeEvent, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { WorkExperiencePost } from "@/types/experience";

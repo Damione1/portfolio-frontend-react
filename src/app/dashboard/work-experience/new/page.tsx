@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { redirect } from "next/navigation";
-import { createWorkExperience } from "../client";
+import { createWorkExperience } from "../../../../clients/work-experience";
 import { WorkExperiencePost } from "@/types/experience";
 import { ChangeEvent, useState } from "react";
 import SwitcherOne from "@/components/Switchers/SwitcherOne";

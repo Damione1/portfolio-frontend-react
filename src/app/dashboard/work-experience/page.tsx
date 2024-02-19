@@ -1,7 +1,10 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
-import { deleteWorkExperience, listWorkExperiences } from "./client";
+import {
+  deleteWorkExperience,
+  listWorkExperiences,
+} from "../../../clients/work-experience";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PostListItem } from "@/components/Tables/TableThree";

@@ -17,6 +17,7 @@ export const projectSchema = z.object({
   content: z.string().min(1),
   cover_image_id: z.number(),
   status: z.enum(["draft", "published", "archived"]),
+  skill_ids: z.array(z.number()).default([] as number[]),
 });
 
 export const uploadImageSchema = z.object({

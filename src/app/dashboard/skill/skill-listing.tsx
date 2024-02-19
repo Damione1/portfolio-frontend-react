@@ -1,50 +1,37 @@
 "use client";
-import { deleteProject, listProjects } from "../../../clients/project";
 import Link from "next/link";
 import { formatDate } from "@/helpers/date";
-import { ProjectItem, ProjectStatus } from "@/types/project";
+import { SkillItem } from "@/types/skill";
 import { useEffect, useState } from "react";
+import { deleteSkill, listSkills } from "@/clients/skills";
 
-const getButtonStyles = (status: string) => {
-  switch (status as ProjectStatus) {
-    case ProjectStatus.Archived:
-      return "inline-flex rounded bg-[#F9C107] py-1 px-2 text-sm font-medium text-[#212B36] hover:bg-opacity-90";
-    case ProjectStatus.Published:
-      return "inline-flex rounded bg-[#3CA745] py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90";
-    case ProjectStatus.Draft:
-      return "inline-flex rounded bg-[#3BA2B8] py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90";
-    default:
-      return "inline-flex rounded bg-primary py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90"; // default styles
-  }
-};
-
-export default function ProjetListing() {
-  const [projectsList, setProjectsList] = useState([] as ProjectItem[]);
+export default function SkillsListing() {
+  const [skillsList, setSkillsList] = useState([] as SkillItem[]);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchData() {
       setIsFetching(true);
-      const { error, projects } = await listProjects();
+      const { error, skills } = await listSkills();
       if (error) {
         setIsFetching(false);
         setError(error);
         return;
       }
       setIsFetching(false);
-      setProjectsList(projects);
+      setSkillsList(skills);
     }
     fetchData();
   }, []);
 
-  async function deleteThisProject(id: number) {
-    const updatedProjects = projectsList.filter((project) => project.id !== id);
-    setProjectsList(updatedProjects);
+  async function deleteThisSkill(id: number) {
+    const updatedSkills = skillsList.filter((skill) => skill.id !== id);
+    setSkillsList(updatedSkills);
 
-    const { error } = await deleteProject(id);
+    const { error } = await deleteSkill(id);
     if (error) {
-      setProjectsList(projectsList);
+      setSkillsList(skillsList);
       alert(`Api error: ${error}`);
     }
   }
@@ -54,16 +41,7 @@ export default function ProjetListing() {
       <thead>
         <tr className="bg-gray-2 text-left dark:bg-meta-4">
           <th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
-            Status
-          </th>
-          <th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
-            Title
-          </th>
-          <th className="py-4 px-4 font-medium text-black dark:text-white">
-            Created At
-          </th>
-          <th className="py-4 px-4 font-medium text-black dark:text-white">
-            Updated At
+            Skill
           </th>
           <th className="py-4 px-4 font-medium text-black dark:text-white">
             Actions
@@ -71,37 +49,19 @@ export default function ProjetListing() {
         </tr>
       </thead>
       <tbody>
-        {projectsList.map((post, key) => (
+        {skillsList.map((post, key) => (
           <tr key={key}>
-            <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-              <button className={getButtonStyles(post.status)}>
-                {post.status}
-              </button>
-            </td>
             <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
               <h5 className="font-medium text-black dark:text-white">
                 {post.title}
               </h5>
             </td>
-            <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-              <p className="text-black dark:text-white">
-                {post.created_at !== ""
-                  ? formatDate(post.created_at.toString(), true)
-                  : "N/A"}
-              </p>
-            </td>
-            <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-              <p className="text-black dark:text-white">
-                {post.updated_at !== ""
-                  ? formatDate(post.updated_at.toString(), true)
-                  : "N/A"}
-              </p>
-            </td>
+
             <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
               <div className="flex items-center space-x-3.5">
                 <Link
                   className="hover:text-primary"
-                  href={`/dashboard/project/${post.id}`}
+                  href={`/dashboard/skill/${post.id}`}
                 >
                   <svg
                     className="fill-current"
@@ -124,7 +84,7 @@ export default function ProjetListing() {
                 <button
                   className="hover:text-primary"
                   onClick={(e) => {
-                    deleteThisProject(post.id);
+                    deleteThisSkill(post.id);
                   }}
                 >
                   <svg
@@ -168,11 +128,11 @@ export default function ProjetListing() {
           </tr>
         )}
 
-        {projectsList.length === 0 && !isFetching && (
+        {skillsList.length === 0 && !isFetching && (
           <tr>
             <td className="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
               <h5 className="font-medium text-black dark:text-white">
-                {error !== "" ? error : "No projects found"}
+                {error !== "" ? error : "No skills found"}
               </h5>
             </td>
           </tr>
