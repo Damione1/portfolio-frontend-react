@@ -1,11 +1,11 @@
 import { ImageItem } from "./media";
 
 export interface SkillItem {
-  id: string;
+  id: number;
   title: string;
-  image_id: string;
   level: string;
   order: number;
   user_id: string;
+  image_id: number;
   image: ImageItem;
 }

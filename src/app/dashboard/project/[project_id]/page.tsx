@@ -2,7 +2,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { notFound } from "next/navigation";
 import { AddEdit } from "../add-edit-form";
 import { Metadata } from "next";
-import { GetProjectById } from "../client";
+import { GetProjectById } from "../../../../clients/project";
+import { listSkills } from "@/clients/skills";
 
 export const metadata: Metadata = {
   title: "Edit Project",
@@ -22,13 +23,19 @@ export default async function AdminProjectEdit({
     notFound();
   }
 
+  const { skills, error: skillsError } = await listSkills();
+
   return (
     <div>
       <Breadcrumb pageName="Edit Project" />
 
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
-          {project ? <AddEdit project={project} /> : <div>Loading...</div>}
+          {project ? (
+            <AddEdit project={project} skills={skills} />
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
       </div>
     </div>
