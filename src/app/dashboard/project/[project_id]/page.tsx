@@ -4,6 +4,7 @@ import { AddEdit } from "../add-edit-form";
 import { Metadata } from "next";
 import { GetProjectById } from "../../../../clients/project";
 import { listSkills } from "@/clients/skills";
+import { Loader2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Edit Project",
@@ -34,7 +35,9 @@ export default async function AdminProjectEdit({
           {project ? (
             <AddEdit project={project} skills={skills} />
           ) : (
-            <div>Loading...</div>
+            <span className="animate-spin mr-4">
+              <Loader2 />
+            </span>
           )}
         </div>
       </div>
