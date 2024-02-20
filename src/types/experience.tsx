@@ -1,23 +1,23 @@
-export interface WorkExperiencePost {
-  _id: string;
+import { SkillItem } from "./skill";
+
+export enum WorkExperienceType {
+  Work = "work",
+  Education = "education",
+  Internship = "internship",
+  Volunteer = "volunteer",
+}
+
+export interface WorkExperienceItem {
+  id: number;
   title: string;
-  subTitle: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
+  subtitle: string;
   description: string;
-  createdAt: string;
-  updatedAt: string;
-
-  /** @deprecated */
-  company: string;
-
-  /** @deprecated */
-  position: string;
-
-  /** @deprecated */
-  school: string;
-
-  /** @deprecated */
-  grade: string;
+  start_date: Date;
+  end_date: Date | null;
+  is_current: boolean;
+  type: WorkExperienceType;
+  skill_ids: number[];
+  skills: SkillItem[];
+  created_at: string;
+  updated_at: string;
 }

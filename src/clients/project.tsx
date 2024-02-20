@@ -14,6 +14,7 @@ export async function listProjects() {
       },
       headers: {
         Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+        Accept: "application/json",
       },
     });
 
