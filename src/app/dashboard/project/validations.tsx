@@ -1,3 +1,4 @@
+import { ProjectStatus } from "@/types/project";
 import { z } from "zod";
 
 export const coverImageSchema = z.custom<File | undefined>((file) => {
@@ -16,7 +17,9 @@ export const projectSchema = z.object({
   excerpt: z.string().min(1).max(500),
   content: z.string().min(1),
   cover_image_id: z.number(),
-  status: z.enum(["draft", "published", "archived"]),
+  status: z
+    .enum(Object.values(ProjectStatus) as [string, ...string[]])
+    .default(ProjectStatus.Draft),
   skill_ids: z.array(z.number()).default([] as number[]),
 });
 
