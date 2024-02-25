@@ -1,14 +1,14 @@
 "use server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { SkillItem } from "@/types/skill";
+import { PostItem } from "@/types/post";
 import { getServerSession } from "next-auth";
 
-export async function listPublicSkills(userId: number) {
+export async function listPublicPosts(userId: number) {
   try {
     const apiUrl = process.env.NEXT_API_URL || "";
 
     const response = await fetch(
-      `${apiUrl}/public/${userId}/skills?sort=-order`,
+      `${apiUrl}/public/${userId}/posts?sort=-created_at`,
       {
         next: {
           revalidate: 10,
@@ -23,25 +23,25 @@ export async function listPublicSkills(userId: number) {
       throw new Error(response.statusText);
     }
 
-    const skillsResponse = await response.json();
-    const skills = skillsResponse.data.map((skill: SkillItem) => {
-      return Object.assign({}, skill) as SkillItem;
-    }) as SkillItem[];
+    const postsResponse = await response.json();
+    const posts = postsResponse.data.map((post: PostItem) => {
+      return Object.assign({}, post) as PostItem;
+    }) as PostItem[];
 
-    return { skills, error: null };
+    return { posts, error: null };
   } catch (error: any) {
     return {
-      skills: [] as SkillItem[],
+      posts: [] as PostItem[],
       error: error,
     };
   }
 }
-export async function listSkills() {
+export async function listPosts() {
   try {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
 
-    const response = await fetch(`${apiUrl}/skills`, {
+    const response = await fetch(`${apiUrl}/posts?sort=-created_at`, {
       next: {
         revalidate: 0,
       },
@@ -55,53 +55,50 @@ export async function listSkills() {
       throw new Error(response.statusText);
     }
 
-    const skillsResponse = await response.json();
-    const skills = skillsResponse.data.map((skill: SkillItem) => {
-      return Object.assign({}, skill) as SkillItem;
-    }) as SkillItem[];
+    const postsResponse = await response.json();
+    const posts = postsResponse.data.map((post: PostItem) => {
+      return Object.assign({}, post) as PostItem;
+    }) as PostItem[];
 
-    return { skills, error: null };
+    return { posts, error: null };
   } catch (error: any) {
     return {
-      skills: [] as SkillItem[],
+      posts: [] as PostItem[],
       error: error,
     };
   }
 }
-export async function GetPublicSkillById(userId: number, skillId: number) {
+export async function GetPublicPostById(userId: number, postId: number) {
   try {
     const apiUrl = process.env.NEXT_API_URL || "";
-    const response = await fetch(
-      `${apiUrl}/public/${userId}/skills/${skillId}`,
-      {
-        next: {
-          revalidate: 10,
-        },
-        headers: {
-          Accept: "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${apiUrl}/public/${userId}/posts/${postId}`, {
+      next: {
+        revalidate: 10,
+      },
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
     if (!response.ok) {
       throw new Error(response.statusText);
     }
 
-    const skillData = await response.json();
-    const skill = Object.assign({}, skillData.data) as SkillItem;
-    return { skill, error: null };
+    const postData = await response.json();
+    const post = Object.assign({}, postData.data) as PostItem;
+    return { post, error: null };
   } catch (error: any) {
     return {
-      skill: {} as SkillItem,
+      post: {} as PostItem,
       error: error,
     };
   }
 }
-export async function GetSkillById(skillId: String) {
+export async function GetPostById(postId: String) {
   try {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
-    const response = await fetch(`${apiUrl}/skills/${skillId}`, {
+    const response = await fetch(`${apiUrl}/posts/${postId}`, {
       next: {
         revalidate: 0,
       },
@@ -115,21 +112,21 @@ export async function GetSkillById(skillId: String) {
       throw new Error(response.statusText);
     }
 
-    const skillData = await response.json();
-    const skill = Object.assign({}, skillData.data) as SkillItem;
-    return { skill, error: null };
+    const postData = await response.json();
+    const post = Object.assign({}, postData.data) as PostItem;
+    return { post, error: null };
   } catch (error: any) {
     return {
-      skill: {} as SkillItem,
+      post: {} as PostItem,
       error: error,
     };
   }
 }
-export async function createSkill(payload: SkillItem) {
+export async function createPost(payload: PostItem) {
   try {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
-    const response = await fetch(`${apiUrl}/skills`, {
+    const response = await fetch(`${apiUrl}/posts`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
@@ -143,22 +140,22 @@ export async function createSkill(payload: SkillItem) {
       throw new Error(response.statusText);
     }
 
-    const skillData = await response.json();
-    const skill = Object.assign({}, skillData.data) as SkillItem;
-    return { skill, error: null };
+    const postData = await response.json();
+    const post = Object.assign({}, postData.data) as PostItem;
+    return { post, error: null };
   } catch (error: any) {
     console.log("error", error);
     return {
-      skill: {} as SkillItem,
+      post: {} as PostItem,
       error: error,
     };
   }
 }
-export async function updateSkill(skillId: number, payload: SkillItem) {
+export async function updatePost(postId: number, payload: PostItem) {
   try {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
-    const response = await fetch(`${apiUrl}/skills/${skillId}`, {
+    const response = await fetch(`${apiUrl}/posts/${postId}`, {
       method: "PATCH",
       body: JSON.stringify(payload),
       headers: {
@@ -172,22 +169,22 @@ export async function updateSkill(skillId: number, payload: SkillItem) {
       throw new Error(response.statusText);
     }
 
-    const skillData = await response.json();
-    const skill = Object.assign({}, skillData.data) as SkillItem;
-    return { skill, error: null };
+    const postData = await response.json();
+    const post = Object.assign({}, postData.data) as PostItem;
+    return { post, error: null };
   } catch (error: any) {
     return {
-      skill: {} as SkillItem,
+      post: {} as PostItem,
       error: error,
     };
   }
 }
 
-export async function deleteSkill(skillId: number) {
+export async function deletePost(postId: number) {
   try {
     const session = await getServerSession(authOptions);
     const apiUrl = process.env.NEXT_API_URL || "";
-    const response = await fetch(`${apiUrl}/skills/${skillId}`, {
+    const response = await fetch(`${apiUrl}/posts/${postId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${session?.backendTokens?.accessToken}`,

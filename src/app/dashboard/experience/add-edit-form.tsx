@@ -1,5 +1,5 @@
 "use client";
-import { WorkExperienceType } from "@/types/experience";
+import { ExperienceItem, ExperienceType } from "@/types/experience";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -7,14 +7,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { SkillItem } from "@/types/skill";
-import { Check, File, Image, Loader2, Pen, Pickaxe, X } from "lucide-react";
-import { WorkExperienceItem } from "@/types/experience";
+import { Check, File, Loader2, Pen, Pickaxe, X } from "lucide-react";
 import { ExperienceInput, experienceSchema } from "./validations";
-import {
-  createWorkExperience,
-  updateWorkExperience,
-} from "@/clients/work-experience";
-import SwitcherOne from "@/components/Switchers/SwitcherOne";
+import { createExperience, updateExperience } from "@/clients/experience";
 import { useState } from "react";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,7 +18,7 @@ export function AddEdit({
   experience,
   skills,
 }: {
-  experience: WorkExperienceItem | null;
+  experience: ExperienceItem | null;
   skills: SkillItem[];
 }) {
   const router = useRouter();
@@ -36,7 +31,7 @@ export function AddEdit({
         start_date: new Date(),
         end_date: undefined,
         is_current: true,
-        type: WorkExperienceType.Work,
+        type: ExperienceType.Work,
         skill_ids: [] as number[],
       }
     : {
@@ -70,6 +65,9 @@ export function AddEdit({
   });
 
   const [isCurrent, setIsCurrent] = useState<boolean>(defaultValues.is_current);
+  const [startDate, setStartDate] = useState<Date | null>(
+    defaultValues.start_date
+  );
 
   async function onSubmit(fields: ExperienceInput) {
     const experiencePayload = {
@@ -80,21 +78,21 @@ export function AddEdit({
       end_date: fields.end_date ? fields.end_date : null,
       type: fields.type,
       skill_ids: fields.skill_ids,
-    } as WorkExperienceItem;
+    } as ExperienceItem;
 
     console.log(experiencePayload);
 
     if (isAddMode) {
-      const res = await createWorkExperience(experiencePayload);
+      const res = await createExperience(experiencePayload);
       if (res.error) {
         console.error("Error creating experience", res.error);
         return;
       }
-      if (res.workExperience) {
-        router.push(`/dashboard/work-experience/${res.workExperience.id}`);
+      if (res.experience) {
+        router.push(`/dashboard/experience/${res.experience.id}`);
       }
     } else {
-      await updateWorkExperience(experience.id, experiencePayload);
+      await updateExperience(experience.id, experiencePayload);
     }
   }
 
@@ -149,8 +147,13 @@ export function AddEdit({
                     render={({ field }) => (
                       <ReactDatePicker
                         placeholderText="Select date"
+                        dateFormat="yyyy/MM/dd"
                         className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                        onChange={(date) => field.onChange(date)}
+                        onChange={(date) => {
+                          field.onChange(date);
+                          setStartDate(date);
+                          setValue("end_date", undefined);
+                        }}
                         selected={field.value}
                       />
                     )}
@@ -211,6 +214,8 @@ export function AddEdit({
                       render={({ field }) => (
                         <ReactDatePicker
                           placeholderText="Select end date"
+                          dateFormat="yyyy/MM/dd"
+                          minDate={startDate}
                           disabled={isCurrent || isSubmitting}
                           className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                           onChange={(date) => {
@@ -255,7 +260,7 @@ export function AddEdit({
                     {...register("type")}
                     className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
                   >
-                    {Object.values(WorkExperienceType).map((type) => (
+                    {Object.values(ExperienceType).map((type) => (
                       <option key={type} value={type}>
                         {type}
                       </option>
