@@ -65,6 +65,9 @@ export function AddEdit({
   });
 
   const [isCurrent, setIsCurrent] = useState<boolean>(defaultValues.is_current);
+  const [startDate, setStartDate] = useState<Date | null>(
+    defaultValues.start_date
+  );
 
   async function onSubmit(fields: ExperienceInput) {
     const experiencePayload = {
@@ -144,8 +147,13 @@ export function AddEdit({
                     render={({ field }) => (
                       <ReactDatePicker
                         placeholderText="Select date"
+                        dateFormat="yyyy/MM/dd"
                         className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                        onChange={(date) => field.onChange(date)}
+                        onChange={(date) => {
+                          field.onChange(date);
+                          setStartDate(date);
+                          setValue("end_date", undefined);
+                        }}
                         selected={field.value}
                       />
                     )}
@@ -206,6 +214,8 @@ export function AddEdit({
                       render={({ field }) => (
                         <ReactDatePicker
                           placeholderText="Select end date"
+                          dateFormat="yyyy/MM/dd"
+                          minDate={startDate}
                           disabled={isCurrent || isSubmitting}
                           className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                           onChange={(date) => {
