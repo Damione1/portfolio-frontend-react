@@ -2,7 +2,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 import Link from "next/link";
 import { Metadata } from "next";
-import SkillsListing from "./skill-listing";
+import SkillsListing from "./listing";
 
 export const metadata: Metadata = {
   title: "Skills",

@@ -3,6 +3,39 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { ProjectItem } from "@/types/project";
 import { getServerSession } from "next-auth";
 
+export async function listPublicProjects(userId: number) {
+  try {
+    const apiUrl = process.env.NEXT_API_URL || "";
+
+    const response = await fetch(
+      `${apiUrl}/public/${userId}/projects?sort=-created_at`,
+      {
+        next: {
+          revalidate: 10,
+        },
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    const projectsResponse = await response.json();
+    const projects = projectsResponse.data.map((project: ProjectItem) => {
+      return Object.assign({}, project) as ProjectItem;
+    }) as ProjectItem[];
+
+    return { projects, error: null };
+  } catch (error: any) {
+    return {
+      projects: [] as ProjectItem[],
+      error: error,
+    };
+  }
+}
 export async function listProjects() {
   try {
     const session = await getServerSession(authOptions);
@@ -31,7 +64,36 @@ export async function listProjects() {
   } catch (error: any) {
     return {
       projects: [] as ProjectItem[],
-      error: error.message,
+      error: error,
+    };
+  }
+}
+export async function GetPublicProjectById(userId: number, projectId: number) {
+  try {
+    const apiUrl = process.env.NEXT_API_URL || "";
+    const response = await fetch(
+      `${apiUrl}/public/${userId}/projects/${projectId}`,
+      {
+        next: {
+          revalidate: 10,
+        },
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    const projectData = await response.json();
+    const project = Object.assign({}, projectData.data) as ProjectItem;
+    return { project, error: null };
+  } catch (error: any) {
+    return {
+      project: {} as ProjectItem,
+      error: error,
     };
   }
 }
@@ -59,7 +121,7 @@ export async function GetProjectById(projectId: String) {
   } catch (error: any) {
     return {
       project: {} as ProjectItem,
-      error: error.message,
+      error: error,
     };
   }
 }
@@ -88,7 +150,7 @@ export async function createProject(payload: ProjectItem) {
     console.log("error", error);
     return {
       project: {} as ProjectItem,
-      error: error.message,
+      error: error,
     };
   }
 }
@@ -116,7 +178,7 @@ export async function updateProject(projectId: number, payload: ProjectItem) {
   } catch (error: any) {
     return {
       project: {} as ProjectItem,
-      error: error.message,
+      error: error,
     };
   }
 }
@@ -139,7 +201,7 @@ export async function deleteProject(projectId: number) {
     return { error: null };
   } catch (error: any) {
     return {
-      error: error.message,
+      error: error,
     };
   }
 }

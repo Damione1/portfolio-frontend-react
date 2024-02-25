@@ -1,13 +1,13 @@
 import { SkillItem } from "./skill";
 
-export enum WorkExperienceType {
+export enum ExperienceType {
   Work = "work",
   Education = "education",
   Internship = "internship",
   Volunteer = "volunteer",
 }
 
-export interface WorkExperienceItem {
+export interface ExperienceItem {
   id: number;
   title: string;
   subtitle: string;
@@ -15,7 +15,7 @@ export interface WorkExperienceItem {
   start_date: Date;
   end_date: Date | null;
   is_current: boolean;
-  type: WorkExperienceType;
+  type: ExperienceType;
   skill_ids: number[];
   skills: SkillItem[];
   created_at: string;

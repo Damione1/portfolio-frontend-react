@@ -1,35 +1,20 @@
-import React from 'react';
-import Link from 'next/link'
-import { ProjectPost } from '../../types/project'
-import ProjectCard from '../../components/public/ProjectCard'
+import React from "react";
+import Link from "next/link";
+import ProjectCard from "../../components/public/ProjectCard";
+import { listPublicProjects } from "@/clients/project";
 
 interface Props {
-  userId: string;
+  userId: number;
   mainTitle: string;
   subTitle: string;
 }
 
-export default async function ProjectsListing({ userId, mainTitle, subTitle }: Props) {
-
-  async function getProjects() {
-    return fetch(`${process.env.NEXT_API_URL}/public/project/${userId}`,
-      {
-        next: {
-          revalidate: 30,
-        },
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response.statusText)
-        }
-        const projects = response.json() as Promise<ProjectPost[]>
-        return projects.then(projects => projects.slice(0, 3))
-      })
-  }
-
-
-  const projectsList = await getProjects()
-
+export default async function ProjectsListing({
+  userId,
+  mainTitle,
+  subTitle,
+}: Props) {
+  const { projects, error } = await listPublicProjects(userId);
 
   return (
     <section className="text-gray-800 my-40 body-font">
@@ -43,13 +28,15 @@ export default async function ProjectsListing({ userId, mainTitle, subTitle }: P
           </h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-          {projectsList.map((project) => (
-            <ProjectCard project={project} key={project._id} />
+          {projects.map((projectItem) => (
+            <ProjectCard project={projectItem} key={projectItem.id} />
           ))}
         </div>
         <div className="text-right w-full mt-8">
-          <Link href="/project" className="text-indigo-500 inline-flex items-center">
-
+          <Link
+            href="/project"
+            className="text-indigo-500 inline-flex items-center"
+          >
             <span className="mr-3">View All Projects</span>
             <svg
               fill="none"
@@ -62,10 +49,9 @@ export default async function ProjectsListing({ userId, mainTitle, subTitle }: P
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-
           </Link>
         </div>
       </div>
     </section>
-  )
+  );
 }
