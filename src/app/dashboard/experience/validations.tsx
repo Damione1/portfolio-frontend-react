@@ -1,4 +1,4 @@
-import { WorkExperienceType } from "@/types/experience";
+import { ExperienceType } from "@/types/experience";
 import { z } from "zod";
 
 export const experienceSchema = z
@@ -10,8 +10,8 @@ export const experienceSchema = z
     end_date: z.date().optional(),
     is_current: z.boolean(),
     type: z
-      .enum(Object.values(WorkExperienceType) as [string, ...string[]])
-      .default(WorkExperienceType.Work),
+      .enum(Object.values(ExperienceType) as [string, ...string[]])
+      .default(ExperienceType.Work),
     skill_ids: z.array(z.number()).default([] as number[]),
   })
   .refine(

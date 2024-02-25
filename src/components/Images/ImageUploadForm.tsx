@@ -2,10 +2,10 @@
 import { ImageItem } from "@/types/media";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { uploadImage } from "./Operations";
 import { UploadImageInput } from "@/app/dashboard/project/validations";
 import { useState } from "react";
 import { Loader2, UploadCloud } from "lucide-react";
+import { uploadImage } from "@/clients/files";
 
 interface ImageUploadFormProps {
   defaultImage: ImageItem | null;

@@ -9,6 +9,7 @@ import {
   Home,
   ImageIcon,
   LampDesk,
+  Newspaper,
   Pickaxe,
 } from "lucide-react";
 
@@ -233,7 +234,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </SidebarLinkGroup>
               {/* <!-- Menu Item Projects --> */}
 
-              {/* <!-- Menu Item Work Experience --> */}
+              {/* <!-- Menu Item Post --> */}
               <SidebarLinkGroup
                 activeCondition={pathname.includes("work-experience")}
               >
@@ -254,8 +255,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
-                        <LampDesk />
-                        Work Experiences
+                        <Newspaper />
+                        Posts
                         <ChevronUp
                           className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
                             open && "rotate-180"
@@ -271,24 +272,24 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          <li key="newworkExperienceBtn">
+                          <li key="newPostBtn">
                             <Link
-                              href="/dashboard/work-experience/new"
+                              href="/dashboard/post/new"
                               className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
                                 pathname === "/" && "text-white"
                               } `}
                             >
-                              New work experience
+                              New post
                             </Link>
                           </li>
-                          <li key="workExperiencesListBtn">
+                          <li key="postListBtn">
                             <Link
-                              href="/dashboard/work-experience"
+                              href="/dashboard/post"
                               className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
                                 pathname === "/" && "text-white"
                               } `}
                             >
-                              Work experiences
+                              Posts
                             </Link>
                           </li>
                         </ul>
@@ -298,7 +299,73 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   );
                 }}
               </SidebarLinkGroup>
-              {/* <!-- Menu Item Work Experience --> */}
+              {/* <!-- Menu Item Post --> */}
+              {/* <!-- Menu Item Experience --> */}
+              <SidebarLinkGroup
+                activeCondition={pathname.includes("work-experience")}
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
+                      <Link
+                        href="#"
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                          (pathname === "/" ||
+                            pathname.includes("experience")) &&
+                          "bg-graydark dark:bg-meta-4"
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          sidebarExpanded
+                            ? handleClick()
+                            : setSidebarExpanded(true);
+                        }}
+                      >
+                        <LampDesk />
+                        Experiences
+                        <ChevronUp
+                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+                            open && "rotate-180"
+                          }`}
+                          width="20"
+                          height="20"
+                        />
+                      </Link>
+                      {/* <!-- Dropdown Menu Start --> */}
+                      <div
+                        className={`translate transform overflow-hidden ${
+                          !open && "hidden"
+                        }`}
+                      >
+                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                          <li key="newExperienceBtn">
+                            <Link
+                              href="/dashboard/experience/new"
+                              className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                pathname === "/" && "text-white"
+                              } `}
+                            >
+                              New experience
+                            </Link>
+                          </li>
+                          <li key="experiencesListBtn">
+                            <Link
+                              href="/dashboard/experience"
+                              className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                pathname === "/" && "text-white"
+                              } `}
+                            >
+                              Experiences
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                      {/* <!-- Dropdown Menu End --> */}
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
+              {/* <!-- Menu Item Experience --> */}
 
               {/* <!-- Menu Item Skill --> */}
               <SidebarLinkGroup

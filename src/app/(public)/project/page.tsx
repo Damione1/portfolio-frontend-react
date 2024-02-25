@@ -1,32 +1,20 @@
-import React from 'react';
-import ProjectCard from '../../../components/public/ProjectCard'
-import { ProjectPost } from '../../../types/project'
+import React from "react";
+import ProjectCard from "../../../components/public/ProjectCard";
 import type { Metadata } from "next";
-
+import { listPublicProjects } from "@/clients/project";
 
 export const metadata: Metadata = {
-  title: 'Damien Goehrig - Projects',
-  description: 'Here are some of my projects',
+  title: "Damien Goehrig - Projects",
+  description: "Here are some of my projects",
 };
 
-const userId = process.env.NEXT_USER_ID || '1';
+const userId =
+  process.env.NEXT_USER_ID && !Number.isNaN(Number(process.env.NEXT_USER_ID))
+    ? Number(process.env.NEXT_USER_ID)
+    : 1;
 
 export default async function ProjectListing() {
-  async function getProjects() {
-    return fetch(`${process.env.NEXT_API_URL}/public/project/${userId}`, {
-      next: {
-        revalidate: 0,
-      },
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response.statusText)
-        }
-        return response.json() as Promise<ProjectPost[]>
-      })
-  }
-
-  const projectsList = await getProjects();
+  const { projects, error } = await listPublicProjects(userId);
 
   return (
     <div className="container max-w-screen-lg xl:max-w-screen-xl dark:text-gray-400color: #b5b5b5;">
@@ -42,11 +30,11 @@ export default async function ProjectListing() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-          {projectsList.map((project) => (
-            <ProjectCard project={project} key={project._id} />
+          {projects.map((projectItem) => (
+            <ProjectCard project={projectItem} key={projectItem.id} />
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 }

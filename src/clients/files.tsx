@@ -1,48 +1,20 @@
 "use server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { PostListItem } from "@/components/Tables/TableThree";
 import { ImageItem } from "@/types/media";
-import { ProjectItem } from "@/types/project";
 import { getServerSession } from "next-auth";
 
 export async function listImages() {
   try {
     const session = await getServerSession(authOptions);
-    const response = await fetch(`${process.env.NEXT_API_URL}/upload`, {
-      next: {
-        revalidate: 0,
-      },
-      headers: {
-        Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-
-    const images = (await response.json()) as ImageItem[];
-    console.log("images", images);
-    return { images, error: null };
-  } catch (error: any) {
-    return {
-      images: {} as ImageItem[],
-      error: error.message,
-    };
-  }
-}
-
-export async function getProjectById(projectId: String) {
-  const session = await getServerSession(authOptions);
-  try {
     const response = await fetch(
-      `${process.env.NEXT_API_URL}/projects/${projectId}`,
+      `${process.env.NEXT_API_URL}/images?sort=-created_at`,
       {
         next: {
           revalidate: 0,
         },
         headers: {
           Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+          Accept: "application/json",
         },
       }
     );
@@ -51,27 +23,65 @@ export async function getProjectById(projectId: String) {
       throw new Error(response.statusText);
     }
 
-    const projectData = await response.json();
-    const project = Object.assign({}, projectData) as ProjectItem;
-    return { project, error: null };
+    const imagesResponse = await response.json();
+    const images = imagesResponse.data.map((image: ImageItem) => {
+      return Object.assign({}, image) as ImageItem;
+    }) as ImageItem[];
+    return { images, error: null };
   } catch (error: any) {
     return {
-      project: {} as ProjectItem,
-      error: error.message,
+      images: {} as ImageItem[],
+      error: error,
     };
   }
 }
 
-export async function createProject(payload: ProjectItem) {
-  console.log("payload", payload);
+export async function getImageById(imageId: String) {
   const session = await getServerSession(authOptions);
   try {
-    const response = await fetch(`${process.env.NEXT_API_URL}/projects`, {
+    const response = await fetch(
+      `${process.env.NEXT_API_URL}/images/${imageId}`,
+
+      {
+        next: {
+          revalidate: 0,
+        },
+        headers: {
+          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    const imageData = await response.json();
+    const image = Object.assign({}, imageData.data) as ImageItem;
+    return { image, error: null };
+  } catch (error: any) {
+    return {
+      image: {} as ImageItem,
+      error: error,
+    };
+  }
+}
+
+export async function uploadImage(formData: FormData) {
+  const image = formData.get("image") as File;
+
+  const formDataPayload = new FormData();
+  formDataPayload.append("image", image);
+
+  const session = await getServerSession(authOptions);
+  try {
+    const response = await fetch(`${process.env.NEXT_API_URL}/images`, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: formDataPayload,
       headers: {
         Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-        "Content-Type": "application/json",
+        Accept: "application/json",
       },
     });
 
@@ -79,57 +89,29 @@ export async function createProject(payload: ProjectItem) {
       throw new Error(response.statusText);
     }
 
-    const projectData = await response.json();
-    const project = Object.assign({}, projectData) as ProjectItem;
-    return { project, error: null };
+    const imageData = await response.json();
+    const image = Object.assign({}, imageData.data) as ImageItem;
+    return { image, error: null };
   } catch (error: any) {
+    console.log("error", error);
     return {
-      project: {} as ProjectItem,
+      image: {} as ImageItem,
       error: error.message,
     };
   }
 }
 
-export async function updateProject(payload: ProjectItem) {
+export async function deleteImage(imageId: string) {
   const session = await getServerSession(authOptions);
   try {
     const response = await fetch(
-      `${process.env.NEXT_API_URL}/projects/${payload.id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-        headers: {
-          Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-
-    const projectData = await response.json();
-    const project = Object.assign({}, projectData) as ProjectItem;
-    return { project, error: null };
-  } catch (error: any) {
-    return {
-      project: {} as ProjectItem,
-      error: error.message,
-    };
-  }
-}
-
-export async function deleteProject(projectId: string) {
-  const session = await getServerSession(authOptions);
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_API_URL}/projects/${projectId}`,
+      `${process.env.NEXT_API_URL}/images/${imageId}`,
       {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${session?.backendTokens?.accessToken}`,
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
       }
     );
@@ -137,13 +119,10 @@ export async function deleteProject(projectId: string) {
       throw new Error(response.statusText);
     }
 
-    const projectData = await response.json();
-    const project = Object.assign({}, projectData);
-    return { project, error: null };
+    return { error: null };
   } catch (error: any) {
     return {
-      project: {} as ProjectItem,
-      error: error.message,
+      error: error,
     };
   }
 }
