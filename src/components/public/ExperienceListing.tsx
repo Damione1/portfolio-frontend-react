@@ -34,12 +34,13 @@ export default async function ExperienceListing({
           )}
         </div>
         <div className="flex flex-wrap items-stretch">
-          {experiences.map((experienceItem) => (
-            <PublicExperienceItem
-              key={experienceItem.id}
-              experience={experienceItem}
-            />
-          ))}
+          {experiences &&
+            experiences.map((experienceItem) => (
+              <PublicExperienceItem
+                key={experienceItem.id}
+                experience={experienceItem}
+              />
+            ))}
         </div>
       </div>
     </section>

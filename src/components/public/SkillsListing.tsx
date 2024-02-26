@@ -32,25 +32,26 @@ export default async function SkillsListing({
           )}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2 lg:gap-6">
-          {skills.map((skillItem: SkillItem) => (
-            <div
-              key={skillItem.id}
-              className="flex flex-col items-center p-3 bg-white dark:bg-boxdark rounded"
-            >
-              {skillItem.image && (
-                <Image
-                  className="w-16 h-16"
-                  src={skillItem.image.path}
-                  alt={skillItem.title}
-                  width={64}
-                  height={64}
-                />
-              )}
-              <p className="mt-2 text-lg font-semibold text-gray-600 dark:text-gray-200">
-                {skillItem.title}
-              </p>
-            </div>
-          ))}
+          {skills &&
+            skills.map((skillItem: SkillItem) => (
+              <div
+                key={skillItem.id}
+                className="flex flex-col items-center p-3 bg-white dark:bg-boxdark rounded"
+              >
+                {skillItem.image && (
+                  <Image
+                    className="w-16 h-16"
+                    src={skillItem.image.path}
+                    alt={skillItem.title}
+                    width={64}
+                    height={64}
+                  />
+                )}
+                <p className="mt-2 text-lg font-semibold text-gray-600 dark:text-gray-200">
+                  {skillItem.title}
+                </p>
+              </div>
+            ))}
         </div>
       </div>
     </section>

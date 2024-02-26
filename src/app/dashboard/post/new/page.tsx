@@ -9,15 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminpostCreate() {
-  const { skills, error: skillsError } = await listSkills();
-
   return (
     <div>
       <Breadcrumb pageName="Create a new post" />
 
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
-          <AddEdit post={null} skills={skills} />
+          <AddEdit post={null} />
         </div>
       </div>
     </div>
