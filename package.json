@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mdx-js/loader": "^3.0.1",
-    "@mdx-js/react": "^3.0.0",
+    "@mdx-js/react": "^3.0.1",
     "@next/mdx": "^14.1.0",
     "@react-jvectormap/core": "^1.0.4",
     "@react-jvectormap/unitedstates": "^1.0.1",
