@@ -1,18 +1,22 @@
-import { ImageItem } from './media'
+import { ImageItem } from "./media";
+import { SkillItem } from "./skill";
 
-export interface ProjectPost {
-    _id: string
-    title: string
-    content: string
-    images: ImageItem[]
-    tags: string[]
-    stack: string[]
-    user: string
-    language: string
-    slug: string
-    createdAt: string
-    updatedAt: string
-    link: string
-    __v: number
-    excerpt: string
+export enum ProjectStatus {
+  Draft = "draft",
+  Published = "published",
+  Archived = "archived",
+}
+export interface ProjectItem {
+  id: number;
+  title: string;
+  excerpt: string;
+  content: string;
+  status: ProjectStatus;
+  skill_ids: number[];
+  skills: SkillItem[];
+  user_id: string;
+  cover_image_id: number | null;
+  cover_image: ImageItem;
+  created_at: string;
+  updated_at: string;
 }

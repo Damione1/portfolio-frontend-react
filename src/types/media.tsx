@@ -1,9 +1,8 @@
 export interface ImageItem {
-    _id: string
-    fileName: string
-    size: number
-    type: string
-    url: string
-    createdAt: string
-    updatedAt: string
+  id: number;
+  path: string;
+  filename: string;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
 }

@@ -1,46 +1,23 @@
-import React from 'react';
-import Image from 'next/image'
-import Link from 'next/link'
-import { formatDate } from '../../../helpers/date'
-import { BlogPost } from '../../../types/blog'
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { formatDate } from "../../../helpers/date";
 import type { Metadata } from "next";
-
+import { listPublicPosts } from "@/clients/posts";
+import { PostItem } from "@/types/post";
 
 export const metadata: Metadata = {
-  title: 'Damien Goehrig - Blog',
-  description: 'Here are some of my blog posts',
+  title: "Damien Goehrig - Blog",
+  description: "Here are some of my blog posts",
 };
 
-
-const userId = process.env.NEXT_USER_ID || '1';
+const userId =
+  process.env.NEXT_USER_ID && !Number.isNaN(Number(process.env.NEXT_USER_ID))
+    ? Number(process.env.NEXT_USER_ID)
+    : 1;
 
 export default async function BlogListing() {
-  const getPostThumbnail = (blogPost: BlogPost) => {
-    let thumbnail =
-      'https://generative-placeholders.glitch.me/image?width=320&height=160&style=joy-division&colors=14'
-    if (blogPost && blogPost.images.length > 0) {
-      thumbnail = blogPost.images[0].url
-    }
-    return thumbnail
-  }
-
-
-  async function getPosts() {
-    return fetch(`${process.env.NEXT_API_URL}/public/blogpost/${userId}`, {
-      next: {
-        revalidate: 0,
-      },
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response.statusText)
-        }
-        return response.json()
-      })
-  }
-
-  const postsList = await getPosts();
-
+  const { posts, error } = await listPublicPosts(userId);
 
   return (
     <div className="blog">
@@ -56,43 +33,47 @@ export default async function BlogListing() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-          {postsList.map((blogPost: BlogPost) => (
-            <div
-              key={blogPost._id}
-              className="overflow-hidden shadow-lg rounded-lg h-90 w-100 sm:w-80 md:w-100 cursor-pointer m-auto bg-white dark:bg-boxdark"
-            >
-              <Link href={`/blog/${blogPost.slug}`} className="w-full block h-full">
-
-                <Image
-                  alt="blog photo"
-                  src={getPostThumbnail(blogPost)}
-                  className="max-h-40 w-full object-cover"
-                  width={320}
-                  height={160}
-                />
-                <div className="dark:bg-neutral-800 w-full p-4">
-                  <p className="text-indigo-500 text-md font-medium">
-                    {blogPost.title}
-                  </p>
-                  {blogPost.excerpt && (
-                    <p className="text-gray-400 dark:text-gray-300 font-light text-md">
-                      {blogPost.excerpt}
-                    </p>
+          {posts &&
+            posts.map((blogPost: PostItem) => (
+              <div
+                key={blogPost.id}
+                className="overflow-hidden shadow-lg rounded-lg h-90 w-100 sm:w-80 md:w-100 cursor-pointer m-auto bg-white dark:bg-boxdark"
+              >
+                <Link
+                  href={`/blog/${blogPost.id}`}
+                  className="w-full block h-full"
+                >
+                  {blogPost.cover_image && (
+                    <Image
+                      alt={blogPost.title}
+                      src={blogPost.cover_image.path}
+                      className="max-h-40 w-full object-cover"
+                      width={320}
+                      height={160}
+                    />
                   )}
-                  <div className="flex items-center mt-4">
-                    <div className="flex flex-col justify-between text-sm">
-                      <p className="text-gray-400 dark:text-gray-300">
-                        {formatDate(blogPost.date.toString())}
+                  <div className="dark:bg-neutral-800 w-full p-4">
+                    <p className="text-indigo-500 text-md font-medium">
+                      {blogPost.title}
+                    </p>
+                    {blogPost.excerpt && (
+                      <p className="text-gray-400 dark:text-gray-300 font-light text-md">
+                        {blogPost.excerpt}
                       </p>
+                    )}
+                    <div className="flex items-center mt-4">
+                      <div className="flex flex-col justify-between text-sm">
+                        <p className="text-gray-400 dark:text-gray-300">
+                          {formatDate(blogPost.created_at.toString())}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            ))}
         </div>
       </div>
     </div>
-  )
+  );
 }
