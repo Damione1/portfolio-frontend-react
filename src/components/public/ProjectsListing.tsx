@@ -28,9 +28,12 @@ export default async function ProjectsListing({
           </h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
-          {projects.map((projectItem) => (
-            <ProjectCard project={projectItem} key={projectItem.id} />
-          ))}
+          {projects &&
+            projects
+              .slice(0, 3)
+              .map((projectItem) => (
+                <ProjectCard project={projectItem} key={projectItem.id} />
+              ))}
         </div>
         <div className="text-right w-full mt-8">
           <Link

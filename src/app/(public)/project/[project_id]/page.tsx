@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import Link from "next/link";
 import { GetPublicProjectById } from "@/clients/project";
 
 export default async function ProjectPost({
